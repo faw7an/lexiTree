@@ -1,0 +1,11 @@
+========================================
+ Parsing Strategy: Bottom-Up (Shift-Reduce)
+========================================
+
+S
+├── NP
+│   └── PRON: "She"
+└── VP
+    ├── V: "loves"
+    └── NP
+        └── PRON: "him"

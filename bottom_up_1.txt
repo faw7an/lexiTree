@@ -1,0 +1,18 @@
+========================================
+ Parsing Strategy: Bottom-Up (Shift-Reduce)
+========================================
+
+S
+├── NP
+│   ├── DET: "The"
+│   ├── ADJ: "quick"
+│   ├── ADJ: "brown"
+│   └── N: "fox"
+└── VP
+    ├── V: "jumps"
+    └── PP
+        ├── PREP: "over"
+        └── NP
+            ├── DET: "the"
+            ├── ADJ: "lazy"
+            └── N: "dog"

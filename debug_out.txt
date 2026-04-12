@@ -1,0 +1,5 @@
+========================================
+ Parsing Strategy: Top-Down (Recursive Descent)
+========================================
+
+Error: Could not parse input as a valid sentence or expression.

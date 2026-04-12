@@ -1,0 +1,11 @@
+========================================
+ Parsing Strategy: Top-Down (Recursive Descent)
+========================================
+
+S
+├── NP
+│   ├── DET: "The"
+│   └── N: "dog"
+└── VP
+    ├── AUX: "is"
+    └── V: "running"

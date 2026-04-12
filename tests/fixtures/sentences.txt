@@ -1,0 +1,10 @@
+The dog sees a cat
+The quick brown fox jumps over the lazy dog
+A man is holding a book
+The tall child walks to the house
+She gives a good book
+The cat runs quickly
+3 + 4 * 2
+(5 + 2) * 8
+10 - 2 + 5 * (3 + 4)
+7 * 8 + 9 / 3

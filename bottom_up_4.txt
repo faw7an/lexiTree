@@ -1,0 +1,15 @@
+========================================
+ Parsing Strategy: Bottom-Up (Shift-Reduce)
+========================================
+
+S
+├── NP
+│   ├── DET: "The"
+│   └── N: "dog"
+└── VP
+    ├── V: "sleeps"
+    └── PP
+        ├── PREP: "in"
+        └── NP
+            ├── DET: "the"
+            └── N: "house"

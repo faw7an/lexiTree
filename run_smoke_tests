@@ -1,0 +1,37 @@
+#!/bin/bash
+g++ -std=c++17 src/*.cpp -Iinclude -o english-parser
+
+echo "Running Smoke Tests (Top-Down)"
+echo "------------------------------"
+fail_count=0
+while IFS= read -r line || [[ -n "$line" ]]; do
+    if ./english-parser "$line" > /dev/null 2>&1; then
+        echo "[  OK  ] $line"
+    else
+        echo "[ FAIL ] $line"
+        fail_count=$((fail_count+1))
+    fi
+done < tests/fixtures/sentences.txt
+
+echo ""
+echo "Running Smoke Tests (Bottom-Up)"
+echo "-------------------------------"
+# Bottom-Up doesn't support math expressions yet based on phase 6 instructions,
+# but we can test the english sentences.
+head -n 6 tests/fixtures/sentences.txt | while IFS= read -r line || [[ -n "$line" ]]; do
+    if ./english-parser --bottom-up "$line" > /dev/null 2>&1; then
+        echo "[  OK  ] $line"
+    else
+        echo "[ FAIL ] $line"
+        fail_count=$((fail_count+1))
+    fi
+done
+
+echo ""
+if [ $fail_count -eq 0 ]; then
+    echo "All smoke tests passed!"
+    exit 0
+else
+    echo "$fail_count smoke tests failed."
+    exit 1
+fi
