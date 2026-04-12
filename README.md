@@ -1,19 +1,21 @@
 # C++17 English Parse Tree Compiler
 
 ## Overview
-This project is a custom compiler built in C++17 that analyzes and parses English sentences and basic arithmetic expressions. It processes raw string input through a lexical analyzer, constructs an Abstract Syntax Tree (AST) using either Top-Down or Bottom-Up parsing strategies, and visually renders the resulting parse tree in the terminal. For English sentences, it also generates a structured Symbol Table that categorizes words by their part of speech and grammatical role.
+This project is a custom compiler built in C++17 that analyzes and parses English sentences and basic arithmetic expressions. It processes raw string input through a lexical analyzer, constructs an Abstract Syntax Tree (AST) using either Top-Down or Bottom-Up parsing strategies, and visually renders the resulting parse tree directly in the terminal as a 2D ASCII structure. For English sentences, it also generates a structured Symbol Table that categorizes words by their part of speech and grammatical role. Furthermore, it supports generating Graphviz DOT files to render the trees graphically.
 
 ## Features
 - **Lexical Analysis**: Custom tokenizer that categorizes words into Parts of Speech (POS) using a built-in dictionary and fallback suffix heuristics (e.g., "-ing", "-ly", "-ed").
 - **Top-Down Parsing**: A Recursive Descent parser that processes Context-Free Grammar (CFG) rules with backtracking.
 - **Bottom-Up Parsing**: A Shift-Reduce parser implementation utilizing a custom 1-token lookahead to resolve shift/reduce conflicts.
-- **AST Visualization**: Renders the Abstract Syntax Tree in a clean, hierarchical ASCII format.
+- **Terminal AST Visualization**: Renders the Abstract Syntax Tree in a highly-structured 2D ASCII format directly in the terminal using standard box-drawing characters.
+- **Graphical AST Export**: Outputs parse trees into the Graphviz DOT format (`--dot`) for generating PNG, SVG, or PDF images.
 - **Symbol Table Generation**: Performs a post-parse traversal of the AST to extract lexical scopes, grammar roles (e.g., NP.head, VP.auxiliary), and POS tags, presented in a formatted ASCII table.
 - **Arithmetic Expressions**: Supports parsing standard math expressions (addition, subtraction, multiplication, division, and parentheses) honoring standard operator precedence.
 
 ## Requirements
 - C++17 compatible compiler (e.g., g++, clang++)
 - Bash (for running test scripts)
+- (Optional) Graphviz installed for rendering `.dot` graphical outputs.
 
 ## Build Instructions
 To compile the project from the source code, run the following command in the project root directory:
@@ -36,6 +38,13 @@ Use the `--bottom-up` flag to force the parser to use the Shift-Reduce strategy.
 ./english-parser --bottom-up "A man is holding a book"
 ```
 
+### Graphical Export (Graphviz DOT)
+Use the `--dot` flag followed by a filename to export the parse tree for graphical rendering. 
+```bash
+./english-parser --dot tree.dot "The quick brown fox jumps over the lazy dog"
+dot -Tpng tree.dot -o tree.png
+```
+
 ### Arithmetic Expressions
 Math expressions are evaluated using the Top-Down parser. Note that the symbol table is automatically suppressed for mathematical inputs.
 ```bash
@@ -56,7 +65,8 @@ Math expressions are evaluated using the Top-Down parser. Note that the symbol t
 - FACTOR -> NUM | LPAREN EXPR RPAREN
 
 ## Project Structure
+- `docs/`: Extensive project documentation, specifications, and roadmap details.
 - `include/`: Header files defining classes and data structures (`lexer.h`, `top_down_parser.h`, etc.).
 - `src/`: Implementation files for the Lexer, Parsers, AST Nodes, and Display utilities.
-- `tests/`: Unit tests and fixture files (e.g., `sentences.txt`) for verifying the parser's integrity.
-- `run_smoke_tests`: A bash script that verifies the core functionality against a set of predefined grammatical and mathematical inputs.
+- `scripts/`: Execution scripts like `run_smoke_tests`.
+- `tests/`: Unit tests and fixture files for verifying parser integrity.

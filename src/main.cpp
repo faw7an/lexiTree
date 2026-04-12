@@ -7,18 +7,28 @@
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " [--bottom-up] \"sentence to parse\"" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " [--bottom-up] [--dot filename] \"sentence to parse\"" << std::endl;
         return 1;
     }
 
     bool use_bottom_up = false;
+    std::string dot_filename = "";
     std::string input = "";
 
-    if (argc >= 3 && std::string(argv[1]) == "--bottom-up") {
-        use_bottom_up = true;
-        input = argv[2];
-    } else {
-        input = argv[1];
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "--bottom-up") {
+            use_bottom_up = true;
+        } else if (arg == "--dot" && i + 1 < argc) {
+            dot_filename = argv[++i];
+        } else {
+            input = arg;
+        }
+    }
+
+    if (input.empty()) {
+        std::cerr << "Error: No input sentence provided." << std::endl;
+        return 1;
     }
 
     Lexer lexer(input);
@@ -37,6 +47,10 @@ int main(int argc, char* argv[]) {
 
     if (root) {
         Display::print_tree(root.get());
+        
+        if (!dot_filename.empty()) {
+            Display::export_dot(root.get(), dot_filename);
+        }
         
         bool is_expr = false;
         for (const auto& token : tokens) {
