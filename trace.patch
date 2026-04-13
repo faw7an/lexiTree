@@ -1,0 +1,10 @@
+--- src/bottom_up_parser.cpp
++++ src/bottom_up_parser.cpp
+@@ -23,9 +23,11 @@
+         if (try_reduce()) {
++            std::cout << "Reduced. Stack:"; for(auto& x:stack_)std::cout<<" "<<x.symbol; std::cout << "\n";
+             continue;
+         } else if (!at_end()) {
+             shift();
++            std::cout << "Shifted. Stack:"; for(auto& x:stack_)std::cout<<" "<<x.symbol; std::cout << "\n";
+         } else {

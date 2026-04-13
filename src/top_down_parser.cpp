@@ -322,6 +322,13 @@ std::unique_ptr<ParseNode> TopDownParser::parse_NP() {
     if (consume(POS::DET, np_dan.get()) && consume(POS::ADJ, np_dan.get()) && consume(POS::N, np_dan.get())) return np_dan;
     cursor_ = saved_cursor;
 
+    // 3a. NP -> DET N N N
+    auto np_dnnn = std::make_unique<ParseNode>();
+    np_dnnn->label = "NP";
+    np_dnnn->type = NodeType::NON_TERMINAL;
+    if (consume(POS::DET, np_dnnn.get()) && consume(POS::N, np_dnnn.get()) && consume(POS::N, np_dnnn.get()) && consume(POS::N, np_dnnn.get())) return np_dnnn;
+    cursor_ = saved_cursor;
+
     // 3. NP -> DET N N
     auto np_dnn = std::make_unique<ParseNode>();
     np_dnn->label = "NP";
@@ -334,6 +341,13 @@ std::unique_ptr<ParseNode> TopDownParser::parse_NP() {
     np3->label = "NP";
     np3->type = NodeType::NON_TERMINAL;
     if (consume(POS::DET, np3.get()) && consume(POS::N, np3.get())) return np3;
+    cursor_ = saved_cursor;
+
+    // 4a. NP -> N N N
+    auto np_nnn = std::make_unique<ParseNode>();
+    np_nnn->label = "NP";
+    np_nnn->type = NodeType::NON_TERMINAL;
+    if (consume(POS::N, np_nnn.get()) && consume(POS::N, np_nnn.get()) && consume(POS::N, np_nnn.get())) return np_nnn;
     cursor_ = saved_cursor;
 
     // 5. NP -> N N

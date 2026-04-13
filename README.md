@@ -56,7 +56,7 @@ Math expressions are evaluated using the Top-Down parser. Note that the symbol t
 ### English Sentences
 - **Contractions**: The Lexer naturally handles common contractions (e.g., "won't", "shouldn't", "can't") by stripping apostrophes during tokenization and resolving them to their base auxiliary tags via the dictionary.
 - S -> NP VP | S PP | S ADV | NP VP PP | INTJ S | INTJ NP ADV | INTJ NP | INTJ | NP AUX NP VP | AUX NP VP | VP | CONJ S S | NP VP CONJ NP | NP VP AUX NP
-- NP -> DET ADJ ADJ N | DET N N | N N | DET ADJ N | DET NUM N | DET N | NUM ADJ N | NUM N | ADJ ADJ N | ADJ N | ADJ V | DET V N N | DET V N | V N | V | PRON | PROPER_N | N
+- NP -> N N N | DET N N N | DET ADJ ADJ N | DET N N | N N | DET ADJ N | DET NUM N | DET N | NUM ADJ N | NUM N | ADJ ADJ N | ADJ N | ADJ V | DET V N N | DET V N | V N | V | PRON | PROPER_N | N
 - VP -> AUX V NP ADV | VP PP | AUX V NP PP | AUX V NP | AUX V PP | AUX V ADV | AUX ADV V | AUX V | AUX NP PP | AUX NP ADV | AUX NP | AUX PP | AUX ADJ | AUX VP | V NP PP | V NP ADV | V NP | V PP | V ADV | V | AUX ADV
 - PP -> PREP NP
 
