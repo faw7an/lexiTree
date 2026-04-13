@@ -17,11 +17,16 @@ void SymbolTable::traverse(const ParseNode* node, const std::string& parent_labe
     if (node->is_leaf()) {
         std::string role;
         
-        if (parent_label == "NP") {
+        if (parent_label == "NP" || parent_label == "NP_participle") {
             if (node->label == "DET") role = "NP.determiner";
+            else if (node->label == "NUM") role = "NP.quantity";
             else if (node->label == "N" || node->label == "PRON" || node->label == "PROPER_N") role = "NP.head";
+            else if (node->label == "V") {
+                if (parent_label == "NP_participle") role = "NP.participle_modifier";
+                else role = "NP.gerund";
+            }
             else if (node->label == "ADJ") role = "NP.modifier";
-            else role = parent_label + "." + node->label;
+            else role = "NP." + node->label;
         } else if (parent_label == "VP") {
             if (node->label == "V") role = "VP.head";
             else if (node->label == "AUX") role = "VP.auxiliary";
@@ -47,8 +52,15 @@ void SymbolTable::traverse(const ParseNode* node, const std::string& parent_labe
             next_scope = "Prepositional";
         }
         
-        for (const auto& child : node->children) {
-            traverse(child.get(), node->label, next_scope);
+        for (size_t i = 0; i < node->children.size(); ++i) {
+            auto& child = node->children[i];
+            std::string pass_label = node->label;
+            if (node->label == "NP" && child->label == "V") {
+                if (i + 1 < node->children.size() && node->children[i+1]->label == "N") {
+                    pass_label = "NP_participle";
+                }
+            }
+            traverse(child.get(), pass_label, next_scope);
         }
     }
 }

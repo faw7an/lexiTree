@@ -28,6 +28,8 @@ std::vector<std::string> Lexer::split_words(const std::string& s) {
                 words.push_back(current_word);
                 current_word.clear();
             }
+        } else if (c == '\'') {
+            continue; // Strips apostrophe so "won't" becomes "wont"
         } else if (std::isdigit(c)) {
             if (!current_word.empty() && !std::isdigit(current_word[0])) {
                 words.push_back(current_word);

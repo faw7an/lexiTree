@@ -3843,3 +3843,15 @@ yesterday ADV
 for PREP
 tomorrow N
 rain V
+
+charger N
+hall N
+break N
+break V
+time N
+students N
+files N
+voters N
+elections N
+projects N
+

@@ -57,9 +57,18 @@ int main(int argc, char* argv[]) {
         
         bool is_expr = false;
         for (const auto& token : tokens) {
-            if (token.tag == POS::NUM || token.tag == POS::OP) {
+            if (token.tag == POS::OP) {
                 is_expr = true;
                 break;
+            }
+        }
+        if (!is_expr && tokens.size() > 0) {
+            is_expr = true;
+            for (const auto& token : tokens) {
+                if (token.tag != POS::NUM && token.tag != POS::OP && token.tag != POS::LPAREN && token.tag != POS::RPAREN) {
+                    is_expr = false;
+                    break;
+                }
             }
         }
         
