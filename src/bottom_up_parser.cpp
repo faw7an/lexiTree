@@ -209,7 +209,6 @@ bool BottomUpParser::reduce_NP() {
 }
 
 bool BottomUpParser::reduce_VP() {
-
     if (stack_top_matches({"AUX", "V", "NP", "ADV"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "VP";
@@ -222,6 +221,21 @@ bool BottomUpParser::reduce_VP() {
         node->add_child(std::move(v));
         node->add_child(std::move(np));
         node->add_child(std::move(adv));
+        stack_.push_back({std::move(node), "VP"});
+        return true;
+    }
+    if (stack_top_matches({"AUX", "V", "NP", "PP"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "VP";
+        node->type = NodeType::NON_TERMINAL;
+        auto pp = std::move(stack_.back().node); stack_.pop_back();
+        auto np = std::move(stack_.back().node); stack_.pop_back();
+        auto v = std::move(stack_.back().node); stack_.pop_back();
+        auto aux = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(aux));
+        node->add_child(std::move(v));
+        node->add_child(std::move(np));
+        node->add_child(std::move(pp));
         stack_.push_back({std::move(node), "VP"});
         return true;
     }
@@ -238,7 +252,6 @@ bool BottomUpParser::reduce_VP() {
         stack_.push_back({std::move(node), "VP"});
         return true;
     }
-
     if (stack_top_matches({"AUX", "V", "PP"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "VP";
@@ -278,6 +291,17 @@ bool BottomUpParser::reduce_VP() {
         stack_.push_back({std::move(node), "VP"});
         return true;
     }
+    if (stack_top_matches({"AUX", "ADV"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "VP";
+        node->type = NodeType::NON_TERMINAL;
+        auto adv = std::move(stack_.back().node); stack_.pop_back();
+        auto aux = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(aux));
+        node->add_child(std::move(adv));
+        stack_.push_back({std::move(node), "VP"});
+        return true;
+    }
     if (stack_top_matches({"AUX", "V"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "VP";
@@ -286,21 +310,6 @@ bool BottomUpParser::reduce_VP() {
         auto aux = std::move(stack_.back().node); stack_.pop_back();
         node->add_child(std::move(aux));
         node->add_child(std::move(v));
-        stack_.push_back({std::move(node), "VP"});
-        return true;
-    }
-
-
-    if (stack_top_matches({"AUX", "NP", "ADV"})) {
-        auto node = std::make_unique<ParseNode>();
-        node->label = "VP";
-        node->type = NodeType::NON_TERMINAL;
-        auto adv = std::move(stack_.back().node); stack_.pop_back();
-        auto np = std::move(stack_.back().node); stack_.pop_back();
-        auto aux = std::move(stack_.back().node); stack_.pop_back();
-        node->add_child(std::move(aux));
-        node->add_child(std::move(np));
-        node->add_child(std::move(adv));
         stack_.push_back({std::move(node), "VP"});
         return true;
     }
@@ -317,6 +326,19 @@ bool BottomUpParser::reduce_VP() {
         stack_.push_back({std::move(node), "VP"});
         return true;
     }
+    if (stack_top_matches({"AUX", "NP", "ADV"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "VP";
+        node->type = NodeType::NON_TERMINAL;
+        auto adv = std::move(stack_.back().node); stack_.pop_back();
+        auto np = std::move(stack_.back().node); stack_.pop_back();
+        auto aux = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(aux));
+        node->add_child(std::move(np));
+        node->add_child(std::move(adv));
+        stack_.push_back({std::move(node), "VP"});
+        return true;
+    }
     if (stack_top_matches({"AUX", "NP"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "VP";
@@ -328,7 +350,6 @@ bool BottomUpParser::reduce_VP() {
         stack_.push_back({std::move(node), "VP"});
         return true;
     }
-
     if (stack_top_matches({"AUX", "ADJ"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "VP";
@@ -351,20 +372,6 @@ bool BottomUpParser::reduce_VP() {
         stack_.push_back({std::move(node), "VP"});
         return true;
     }
-
-    if (stack_top_matches({"V", "NP", "ADV"})) {
-        auto node = std::make_unique<ParseNode>();
-        node->label = "VP";
-        node->type = NodeType::NON_TERMINAL;
-        auto adv = std::move(stack_.back().node); stack_.pop_back();
-        auto np = std::move(stack_.back().node); stack_.pop_back();
-        auto v = std::move(stack_.back().node); stack_.pop_back();
-        node->add_child(std::move(v));
-        node->add_child(std::move(np));
-        node->add_child(std::move(adv));
-        stack_.push_back({std::move(node), "VP"});
-        return true;
-    }
     if (stack_top_matches({"V", "NP", "PP"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "VP";
@@ -375,6 +382,19 @@ bool BottomUpParser::reduce_VP() {
         node->add_child(std::move(v));
         node->add_child(std::move(np));
         node->add_child(std::move(pp));
+        stack_.push_back({std::move(node), "VP"});
+        return true;
+    }
+    if (stack_top_matches({"V", "NP", "ADV"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "VP";
+        node->type = NodeType::NON_TERMINAL;
+        auto adv = std::move(stack_.back().node); stack_.pop_back();
+        auto np = std::move(stack_.back().node); stack_.pop_back();
+        auto v = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(v));
+        node->add_child(std::move(np));
+        node->add_child(std::move(adv));
         stack_.push_back({std::move(node), "VP"});
         return true;
     }
@@ -424,6 +444,49 @@ bool BottomUpParser::reduce_VP() {
 }
 
 bool BottomUpParser::reduce_S() {
+    if (stack_top_matches({"CONJ", "S", "S"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "S";
+        node->type = NodeType::NON_TERMINAL;
+        auto s2 = std::move(stack_.back().node); stack_.pop_back();
+        auto s1 = std::move(stack_.back().node); stack_.pop_back();
+        auto conj = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(conj));
+        node->add_child(std::move(s1));
+        node->add_child(std::move(s2));
+        stack_.push_back({std::move(node), "S"});
+        return true;
+    }
+    if (stack_top_matches({"NP", "VP", "CONJ", "NP"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "S";
+        node->type = NodeType::NON_TERMINAL;
+        auto np2 = std::move(stack_.back().node); stack_.pop_back();
+        auto conj = std::move(stack_.back().node); stack_.pop_back();
+        auto vp = std::move(stack_.back().node); stack_.pop_back();
+        auto np1 = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(np1));
+        node->add_child(std::move(vp));
+        node->add_child(std::move(conj));
+        node->add_child(std::move(np2));
+        stack_.push_back({std::move(node), "S"});
+        return true;
+    }
+    if (stack_top_matches({"NP", "VP", "AUX", "NP"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "S";
+        node->type = NodeType::NON_TERMINAL;
+        auto np2 = std::move(stack_.back().node); stack_.pop_back();
+        auto aux = std::move(stack_.back().node); stack_.pop_back();
+        auto vp = std::move(stack_.back().node); stack_.pop_back();
+        auto np1 = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(np1));
+        node->add_child(std::move(vp));
+        node->add_child(std::move(aux));
+        node->add_child(std::move(np2));
+        stack_.push_back({std::move(node), "S"});
+        return true;
+    }
     if (stack_top_matches({"NP", "AUX", "NP", "VP"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "S";

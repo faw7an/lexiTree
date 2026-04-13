@@ -34,6 +34,8 @@ void SymbolTable::traverse(const ParseNode* node, const std::string& parent_labe
             role = "S.interjection";
         } else if (parent_label == "S" && node->label == "AUX") {
             role = "S.auxiliary";
+        } else if (parent_label == "S" && node->label == "CONJ") {
+            role = "S.conjunction";
         } else {
             role = parent_label + "." + node->label;
         }
