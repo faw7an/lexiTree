@@ -72,7 +72,7 @@ POS Lexer::assign_pos(const std::string& word, bool is_first_word) {
     if (lower_word.size() > 3 && lower_word.substr(lower_word.size() - 3) == "ing") {
         return POS::V;
     }
-    if (lower_word.size() > 2 && lower_word.substr(lower_word.size() - 2) == "ly") {
+    if (lower_word.size() >= 4 && lower_word.substr(lower_word.size() - 2) == "ly") {
         return POS::ADV;
     }
     if (lower_word.size() > 2 && lower_word.substr(lower_word.size() - 2) == "ed") {
@@ -88,7 +88,7 @@ POS Lexer::assign_pos(const std::string& word, bool is_first_word) {
         return POS::PROPER_N;
     }
 
-    return POS::UNKNOWN;
+    return POS::N;
 }
 
 std::vector<Token> Lexer::tokenize() {

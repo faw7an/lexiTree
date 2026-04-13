@@ -1,0 +1,10 @@
+--- src/bottom_up_parser.cpp
++++ src/bottom_up_parser.cpp
+@@ -19,6 +19,10 @@
+     while (loop_counter++ < max_loops) {
++        std::cout << "Stack: ";
++        for (const auto& item : stack_) std::cout << item.symbol << " ";
++        std::cout << " | Next: " << (at_end() ? "EOF" : pos_to_str(tokens_[input_pos_].tag)) << "\n";
+         if (stack_.size() == 1 && stack_.back().symbol == "S" && at_end()) {
+             return std::move(stack_.back().node);
+         }

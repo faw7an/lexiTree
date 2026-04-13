@@ -3838,3 +3838,8 @@ widely ADV
 worldwide ADV
 yearly ADV
 yesterday ADV
+
+# ── CUSTOM FIXES ──
+for PREP
+tomorrow N
+rain V

@@ -2,10 +2,13 @@
 #include "top_down_parser.h"
 #include "bottom_up_parser.h"
 #include "display.h"
+#include "pos_dict.h"
 #include <iostream>
 #include <string>
 
 int main(int argc, char* argv[]) {
+    load_dictionary("data/dictionary.txt");
+
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " [--bottom-up] [--dot filename] \"sentence to parse\"" << std::endl;
         return 1;

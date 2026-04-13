@@ -54,9 +54,9 @@ Math expressions are evaluated using the Top-Down parser. Note that the symbol t
 ## Supported Grammar
 
 ### English Sentences
-- S -> NP VP | NP VP PP
+- S -> NP VP | NP VP PP | INTJ S | INTJ NP ADV | INTJ NP | INTJ | NP AUX NP VP | AUX NP VP | VP
 - NP -> DET ADJ ADJ N | DET ADJ N | DET N | PRON | PROPER_N | N
-- VP -> AUX V NP | AUX V | V NP PP | V NP | V PP | V ADV | V
+- VP -> AUX V NP | AUX V | V NP PP | V NP | V PP | V ADV | V | AUX NP | AUX ADJ | AUX NP ADV | AUX VP
 - PP -> PREP NP
 
 ### Arithmetic Expressions

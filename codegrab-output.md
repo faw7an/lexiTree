@@ -2,11 +2,14 @@
 
 ```
 lexiTree/
+├── data/
+│   └── dictionary.txt
 ├── docs/
 │   ├── AGENT.md
 │   ├── PROJECT_GUIDE.md
 │   ├── ROADMAP.md
-│   └── addendum-functions-and-ambiguity.md
+│   ├── addendum-functions-and-ambiguity.md
+│   └── plan.md
 ├── include/
 │   ├── bottom_up_parser.h
 │   ├── display.h
@@ -34,10 +37,3860 @@ lexiTree/
 │   ├── test_lexer.cpp
 │   ├── test_symbol_table.cpp
 │   └── test_top_down.cpp
-└── README.md
+├── README.md
+├── justfile
+├── patch_debug
+├── update_bottom_up.patch
+└── update_top_down.patch
 ```
 
 # Project Files
+
+## File: `data/dictionary.txt`
+
+```text
+# English POS Dictionary for Parser
+# Format: word TAG
+# Tags: DET N V ADJ ADV PREP PRON CONJ AUX NUM PROPER_N INTJ
+# Unknown/new words (names, places, slang) default to N at runtime.
+# Add custom words at the bottom of this file.
+#
+
+# ── DET (determiners) ──
+a DET
+all DET
+an DET
+any DET
+both DET
+each DET
+either DET
+enough DET
+every DET
+few DET
+half DET
+her DET
+his DET
+its DET
+least DET
+less DET
+little DET
+many DET
+more DET
+most DET
+much DET
+my DET
+neither DET
+no DET
+other DET
+our DET
+several DET
+some DET
+such DET
+that DET
+the DET
+their DET
+these DET
+this DET
+those DET
+whosever DET
+your DET
+zero DET
+
+# ── PRON (pronouns) ──
+another PRON
+anyone PRON
+anything PRON
+anywhere PRON
+each other PRON
+everybody PRON
+everyone PRON
+everything PRON
+everywhere PRON
+he PRON
+here ADV
+hers PRON
+herself PRON
+him PRON
+himself PRON
+i PRON
+it PRON
+itself PRON
+me PRON
+mine PRON
+myself PRON
+no one PRON
+nobody PRON
+nothing PRON
+nowhere PRON
+one PRON
+one another PRON
+ones PRON
+others PRON
+ours PRON
+ourselves PRON
+she PRON
+somebody PRON
+someone PRON
+something PRON
+somewhere PRON
+theirs PRON
+them PRON
+themselves PRON
+there ADV
+they PRON
+u PRON
+us PRON
+we PRON
+what PRON
+whatever PRON
+which PRON
+whichever PRON
+who PRON
+whoever PRON
+whom PRON
+whomever PRON
+whose PRON
+you PRON
+yours PRON
+yourself PRON
+yourselves PRON
+
+# ── AUX (auxiliaries) ──
+aint AUX
+am AUX
+are AUX
+arent AUX
+be AUX
+been AUX
+being AUX
+can AUX
+cant AUX
+could AUX
+couldnt AUX
+dare AUX
+did AUX
+didnt AUX
+do AUX
+does AUX
+doesnt AUX
+doing AUX
+done AUX
+had AUX
+hadnt AUX
+has AUX
+hasnt AUX
+have AUX
+havent AUX
+having AUX
+is AUX
+isnt AUX
+may AUX
+might AUX
+must AUX
+mustnt AUX
+ought AUX
+shall AUX
+should AUX
+shouldnt AUX
+was AUX
+wasnt AUX
+were AUX
+werent AUX
+will AUX
+wont AUX
+would AUX
+wouldnt AUX
+
+# ── PREP (prepositions) ──
+aboard PREP
+about PREP
+above PREP
+across PREP
+against PREP
+along PREP
+amid PREP
+amidst PREP
+among PREP
+amongst PREP
+around PREP
+aside PREP
+at PREP
+atop PREP
+behind PREP
+below PREP
+beneath PREP
+beside PREP
+between PREP
+beyond PREP
+by PREP
+concerning PREP
+despite PREP
+down PREP
+during PREP
+except PREP
+excluding PREP
+from PREP
+in PREP
+inside PREP
+into PREP
+like PREP
+minus PREP
+near PREP
+nearby PREP
+notwithstanding PREP
+of PREP
+off PREP
+on PREP
+onto PREP
+opposite PREP
+out PREP
+outside PREP
+over PREP
+past PREP
+pending PREP
+per PREP
+plus PREP
+regarding PREP
+through PREP
+throughout PREP
+to PREP
+toward PREP
+towards PREP
+under PREP
+underneath PREP
+unlike PREP
+unto PREP
+up PREP
+upon PREP
+versus PREP
+via PREP
+vs PREP
+with PREP
+within PREP
+without PREP
+worth PREP
+
+# ── CONJ (conjunctions) ──
+accordingly CONJ
+additionally CONJ
+after CONJ
+alternatively CONJ
+although CONJ
+and CONJ
+as CONJ
+as long as CONJ
+as soon as CONJ
+assuming CONJ
+because CONJ
+before CONJ
+besides CONJ
+but CONJ
+consequently CONJ
+even CONJ
+even if CONJ
+even though CONJ
+eventually CONJ
+finally CONJ
+for CONJ
+furthermore CONJ
+hence CONJ
+however CONJ
+if CONJ
+in case CONJ
+in order that CONJ
+instead CONJ
+lest CONJ
+meanwhile CONJ
+moreover CONJ
+nevertheless CONJ
+nonetheless CONJ
+nor CONJ
+now CONJ
+now that CONJ
+once CONJ
+or CONJ
+otherwise CONJ
+overall CONJ
+provided CONJ
+rather than CONJ
+since CONJ
+so CONJ
+so that CONJ
+such that CONJ
+than CONJ
+thereby CONJ
+therefore CONJ
+thereof CONJ
+though CONJ
+thus CONJ
+unless CONJ
+until CONJ
+when CONJ
+whenever CONJ
+where CONJ
+whereas CONJ
+whereby CONJ
+wherein CONJ
+wherever CONJ
+whether CONJ
+while CONJ
+yet CONJ
+
+# ── NUM (numbers) ──
+billion NUM
+dozen NUM
+eight NUM
+eighteen NUM
+eighth NUM
+eighty NUM
+eleven NUM
+eleventh NUM
+fifteen NUM
+fifth NUM
+fifty NUM
+five NUM
+forty NUM
+four NUM
+fourteen NUM
+fourth NUM
+hundred NUM
+million NUM
+nine NUM
+nineteen NUM
+ninety NUM
+ninth NUM
+quarter NUM
+seven NUM
+seventeen NUM
+seventh NUM
+seventy NUM
+six NUM
+sixteen NUM
+sixth NUM
+sixty NUM
+ten NUM
+tenth NUM
+third NUM
+thirteen NUM
+thirty NUM
+thousand NUM
+three NUM
+trillion NUM
+twelfth NUM
+twelve NUM
+twenty NUM
+twice NUM
+two NUM
+
+# ── INTJ (interjections) ──
+absolutely INTJ
+ah INTJ
+alas INTJ
+apparently INTJ
+basically INTJ
+bye INTJ
+certainly INTJ
+clearly INTJ
+definitely INTJ
+exactly INTJ
+frankly INTJ
+hello INTJ
+hey INTJ
+hi INTJ
+hmm INTJ
+honestly INTJ
+hooray INTJ
+hopefully INTJ
+huh INTJ
+hurray INTJ
+indeed INTJ
+just INTJ
+literally INTJ
+merely INTJ
+nope INTJ
+obviously INTJ
+oh INTJ
+ok INTJ
+okay INTJ
+ooh INTJ
+oops INTJ
+ouch INTJ
+really INTJ
+right INTJ
+seriously INTJ
+simply INTJ
+sure INTJ
+thankfully INTJ
+ugh INTJ
+unfortunately INTJ
+well INTJ
+whoa INTJ
+wow INTJ
+yay INTJ
+yeah INTJ
+yep INTJ
+
+# ── V (verbs) ──
+accept V
+accepted V
+accepting V
+accepts V
+achieve V
+achieveed V
+achieveing V
+achieves V
+add V
+added V
+adding V
+adds V
+admire V
+admired V
+admires V
+admiring V
+advise V
+adviseed V
+adviseing V
+advises V
+affect V
+affected V
+affecting V
+affects V
+agree V
+agreed V
+agreeed V
+agreeing V
+agrees V
+allow V
+allowed V
+allowing V
+allows V
+analyze V
+analyzeed V
+analyzeing V
+analyzes V
+announce V
+announceed V
+announceing V
+announces V
+answered V
+answering V
+apologize V
+apologizeed V
+apologizeing V
+apologizes V
+appear V
+appeared V
+appearing V
+appears V
+argue V
+argueed V
+argueing V
+argues V
+arrive V
+arriveed V
+arriveing V
+arrives V
+ask V
+asked V
+asking V
+asks V
+assume V
+assumed V
+assumes V
+ate V
+attach V
+attached V
+attaching V
+attachs V
+attack V
+attacked V
+attacking V
+attacks V
+attend V
+attended V
+attending V
+attends V
+bake V
+bakeed V
+bakeing V
+bakes V
+beat V
+beaten V
+beating V
+beats V
+became V
+become V
+becomes V
+becoming V
+beg V
+began V
+beged V
+begin V
+beging V
+beginning V
+begins V
+begs V
+begun V
+believe V
+believed V
+believeed V
+believeing V
+believes V
+believing V
+belong V
+belonged V
+belonging V
+belongs V
+bend V
+bending V
+bends V
+bent V
+bit V
+bite V
+bites V
+biting V
+bitten V
+blame V
+blameed V
+blameing V
+blames V
+blew V
+block V
+blocked V
+blocking V
+blocks V
+blow V
+blowing V
+blown V
+blows V
+bought V
+break V
+breaked V
+breaking V
+breaks V
+breathe V
+breatheed V
+breatheing V
+breathes V
+bring V
+bringing V
+brings V
+broke V
+broken V
+brought V
+build V
+builded V
+building V
+builds V
+built V
+buy V
+buying V
+buys V
+calculate V
+calculateed V
+calculateing V
+calculates V
+call V
+called V
+calling V
+calls V
+came V
+care V
+careed V
+careing V
+cares V
+carried V
+carries V
+carry V
+carrying V
+catch V
+catches V
+catching V
+caught V
+causeed V
+causeing V
+change V
+changed V
+changeed V
+changeing V
+changes V
+changing V
+check V
+checked V
+checking V
+checks V
+choose V
+chooses V
+choosing V
+chose V
+chosen V
+claim V
+claimed V
+claiming V
+claims V
+cleaned V
+cleaning V
+cleans V
+climb V
+climbed V
+climbing V
+climbs V
+close V
+closed V
+closes V
+closing V
+collect V
+collected V
+collecting V
+collects V
+colored V
+coloring V
+colors V
+colour V
+coloured V
+colouring V
+combine V
+combined V
+combines V
+combining V
+come V
+comes V
+coming V
+compare V
+compareed V
+compareing V
+compares V
+complain V
+complained V
+complaining V
+complains V
+completeed V
+completeing V
+completes V
+confirm V
+confirmed V
+confirming V
+confirms V
+connect V
+connected V
+connecting V
+connects V
+consider V
+considered V
+considering V
+considers V
+construct V
+constructed V
+constructing V
+constructs V
+contain V
+contained V
+containing V
+contains V
+continue V
+continued V
+continueed V
+continueing V
+continues V
+continuing V
+control V
+controled V
+controling V
+controlled V
+controlling V
+controls V
+cook V
+cooked V
+cooking V
+cooks V
+cooled V
+cooling V
+cools V
+copy V
+copyed V
+copying V
+copys V
+count V
+counted V
+counting V
+counts V
+crawl V
+crawled V
+crawling V
+crawls V
+create V
+created V
+creates V
+creating V
+creep V
+creeping V
+creeps V
+crept V
+cried V
+cries V
+criticize V
+criticizeed V
+criticizeing V
+criticizes V
+cross V
+crossed V
+crossing V
+crosss V
+cry V
+crying V
+cut V
+cuted V
+cuting V
+cuts V
+cutted V
+cutting V
+dance V
+danced V
+danceed V
+danceing V
+dances V
+dancing V
+deal V
+dealing V
+deals V
+dealt V
+decide V
+decided V
+decides V
+deciding V
+declare V
+declareed V
+declareing V
+declares V
+decrease V
+decreased V
+decreaseed V
+decreaseing V
+decreases V
+decreasing V
+defend V
+defended V
+defending V
+defends V
+delete V
+deleteed V
+deleteing V
+deletes V
+demand V
+demanded V
+demanding V
+demands V
+deny V
+denyed V
+denying V
+denys V
+depend V
+depended V
+depending V
+depends V
+describe V
+described V
+describeed V
+describeing V
+describes V
+describing V
+deserve V
+deserveed V
+deserveing V
+deserves V
+design V
+designed V
+designing V
+designs V
+destroy V
+destroyed V
+destroying V
+destroys V
+detect V
+detected V
+detecting V
+detects V
+develop V
+developed V
+developing V
+develops V
+direct V
+directed V
+directing V
+directs V
+disagree V
+disagreeed V
+disagreeing V
+disagrees V
+discover V
+discovered V
+discovering V
+discovers V
+discuss V
+discussed V
+discussing V
+discusss V
+distribute V
+distributeed V
+distributeing V
+distributes V
+divide V
+divided V
+divides V
+dividing V
+doubt V
+doubted V
+doubting V
+doubts V
+drank V
+draw V
+drawing V
+drawn V
+draws V
+dressed V
+dressing V
+dresss V
+drew V
+drift V
+drifted V
+drifting V
+drifts V
+drink V
+drinking V
+drinks V
+drive V
+driveed V
+driveing V
+driven V
+drives V
+driving V
+drop V
+droped V
+droping V
+dropped V
+dropping V
+drops V
+drove V
+drunk V
+earn V
+earned V
+earning V
+earns V
+eat V
+eaten V
+eating V
+eats V
+emptyed V
+emptying V
+emptys V
+enable V
+enableed V
+enableing V
+enables V
+end V
+ended V
+ending V
+ends V
+enjoy V
+enjoyed V
+enjoying V
+enjoys V
+enter V
+entered V
+entering V
+enters V
+equal V
+equaled V
+equaling V
+equals V
+estimate V
+estimateed V
+estimateing V
+estimates V
+evaluate V
+evaluateed V
+evaluateing V
+evaluates V
+examine V
+examineed V
+examineing V
+examines V
+exclude V
+excludeed V
+excludeing V
+excludes V
+exist V
+existed V
+existing V
+exists V
+exit V
+exited V
+exiting V
+exits V
+expand V
+expanded V
+expanding V
+expands V
+expect V
+expected V
+expecting V
+expects V
+explain V
+explained V
+explaining V
+explains V
+extend V
+extended V
+extending V
+extends V
+fail V
+failed V
+failing V
+fails V
+fall V
+fallen V
+falling V
+falls V
+farm V
+farmed V
+farming V
+farms V
+feared V
+fearing V
+fears V
+feed V
+feeded V
+feeding V
+feeds V
+feel V
+feeled V
+feeling V
+feels V
+fell V
+felt V
+fight V
+fighting V
+fights V
+fill V
+filled V
+filling V
+fills V
+find V
+finding V
+finds V
+finish V
+finished V
+finishes V
+finishing V
+finishs V
+fit V
+fits V
+fitting V
+fix V
+fixing V
+fixs V
+flew V
+flies V
+float V
+floated V
+floating V
+floats V
+flow V
+flowed V
+flowing V
+flown V
+flows V
+fly V
+flying V
+follow V
+followed V
+following V
+follows V
+forgave V
+forget V
+forgeted V
+forgeting V
+forgets V
+forgetting V
+forgive V
+forgiveed V
+forgiveing V
+forgiven V
+forgives V
+forgiving V
+forgot V
+forgotten V
+fought V
+found V
+freeze V
+freezes V
+freezing V
+froze V
+frozen V
+gain V
+gained V
+gaining V
+gains V
+gather V
+gathered V
+gathering V
+gathers V
+gave V
+gaze V
+gazeed V
+gazeing V
+gazes V
+generate V
+generated V
+generates V
+generating V
+get V
+gets V
+getting V
+give V
+given V
+gives V
+giving V
+glance V
+glanceed V
+glanceing V
+glances V
+glide V
+glided V
+glides V
+gliding V
+glow V
+glowed V
+glowing V
+glows V
+go V
+goes V
+going V
+gone V
+got V
+gotten V
+grab V
+grabed V
+grabing V
+grabs V
+greet V
+greeted V
+greeting V
+greets V
+grew V
+grow V
+growed V
+growing V
+grown V
+grows V
+guess V
+guessed V
+guessing V
+guesss V
+guide V
+guideed V
+guideing V
+guides V
+happen V
+happened V
+happening V
+happens V
+harvest V
+harvested V
+harvesting V
+harvests V
+hated V
+hates V
+hating V
+heal V
+healed V
+healing V
+heals V
+hear V
+heard V
+hearing V
+hears V
+heated V
+heating V
+heats V
+held V
+help V
+helped V
+helping V
+helps V
+hid V
+hidden V
+hide V
+hides V
+hiding V
+hit V
+hits V
+hitted V
+hitting V
+hold V
+holding V
+holds V
+hop V
+hoped V
+hopeed V
+hopeing V
+hopes V
+hoping V
+hops V
+hunt V
+hunted V
+hunting V
+hunts V
+hurried V
+hurries V
+hurry V
+hurrying V
+imagine V
+imagined V
+imagineed V
+imagineing V
+imagines V
+imagining V
+improve V
+improved V
+improveed V
+improveing V
+improves V
+improving V
+include V
+included V
+includeed V
+includeing V
+includes V
+including V
+increase V
+increased V
+increaseed V
+increaseing V
+increases V
+increasing V
+influence V
+influenceed V
+influenceing V
+influences V
+inform V
+informed V
+informing V
+informs V
+inspire V
+inspired V
+inspires V
+inspiring V
+introduce V
+introduceed V
+introduceing V
+introduces V
+investigate V
+investigateed V
+investigateing V
+investigates V
+invite V
+inviteed V
+inviteing V
+invites V
+jog V
+joged V
+joging V
+jogs V
+join V
+joined V
+joining V
+joins V
+judgeed V
+judgeing V
+judges V
+jump V
+jumped V
+jumping V
+jumps V
+keep V
+keeped V
+keeping V
+keeps V
+kept V
+kick V
+kicked V
+kicking V
+kicks V
+kill V
+killed V
+killing V
+kills V
+kneel V
+kneeling V
+kneels V
+knelt V
+knew V
+knit V
+knits V
+knitting V
+know V
+knowing V
+known V
+knows V
+lack V
+lacked V
+lacking V
+lacks V
+laid V
+lain V
+last V
+lasted V
+lasting V
+lasts V
+laugh V
+laughed V
+laughing V
+laughs V
+lay V
+laying V
+lays V
+lead V
+leaded V
+leading V
+leads V
+leap V
+leaping V
+leaps V
+leapt V
+learn V
+learned V
+learning V
+learns V
+leave V
+leaved V
+leaveed V
+leaveing V
+leaves V
+leaving V
+led V
+left V
+let V
+lets V
+letting V
+lie V
+lies V
+lift V
+lifted V
+lifting V
+lifts V
+likeed V
+likeing V
+likes V
+limit V
+limiting V
+limits V
+link V
+linked V
+linking V
+links V
+listen V
+listened V
+listening V
+listens V
+live V
+lived V
+lives V
+living V
+look V
+looked V
+looking V
+looks V
+lose V
+loses V
+losing V
+lost V
+love V
+loved V
+loves V
+loving V
+lying V
+made V
+make V
+makes V
+making V
+manage V
+managed V
+manageed V
+manageing V
+manages V
+managing V
+march V
+marched V
+marching V
+marchs V
+match V
+matched V
+matching V
+matchs V
+matter V
+mattered V
+mattering V
+matters V
+mean V
+meaning V
+means V
+meant V
+measure V
+measureed V
+measureing V
+measures V
+meet V
+meeting V
+meets V
+memorize V
+memorizeed V
+memorizeing V
+memorizes V
+mention V
+mentioned V
+mentioning V
+mentions V
+merge V
+mergeed V
+mergeing V
+merges V
+met V
+mind V
+minded V
+minding V
+minds V
+mix V
+mixed V
+mixing V
+mixs V
+move V
+moved V
+moves V
+moving V
+need V
+needed V
+needing V
+needs V
+notice V
+noticed V
+noticeed V
+noticeing V
+notices V
+noticing V
+notify V
+notifyed V
+notifying V
+notifys V
+observe V
+observeed V
+observeing V
+observes V
+occur V
+occured V
+occuring V
+occurs V
+open V
+opened V
+opening V
+opens V
+order V
+ordered V
+ordering V
+orders V
+organize V
+organizeed V
+organizeing V
+organizes V
+own V
+owned V
+owning V
+owns V
+paid V
+paint V
+painted V
+painting V
+paints V
+pass V
+passed V
+passing V
+passs V
+paste V
+pasteed V
+pasteing V
+pastes V
+pay V
+paying V
+pays V
+peek V
+peeked V
+peeking V
+peeks V
+persist V
+persisted V
+persisting V
+persists V
+pick V
+picked V
+picking V
+picks V
+placeed V
+placeing V
+places V
+planed V
+planing V
+planted V
+planting V
+play V
+played V
+playing V
+plays V
+plead V
+pleaded V
+pleading V
+pleads V
+possess V
+possessed V
+possessing V
+possesss V
+post V
+posted V
+posting V
+posts V
+pour V
+poured V
+pouring V
+pours V
+practice V
+practiced V
+practiceed V
+practiceing V
+practices V
+practicing V
+praise V
+praiseed V
+praiseing V
+praises V
+prefer V
+prefered V
+prefering V
+prefers V
+prepare V
+prepareed V
+prepareing V
+prepares V
+press V
+pressed V
+pressing V
+presss V
+prevent V
+prevented V
+preventing V
+prevents V
+print V
+printed V
+printing V
+prints V
+produce V
+produced V
+produces V
+producing V
+promise V
+promiseed V
+promiseing V
+promises V
+protect V
+protected V
+protecting V
+protects V
+publish V
+published V
+publishing V
+publishs V
+pull V
+pulled V
+pulling V
+pulls V
+punch V
+punched V
+punching V
+punchs V
+push V
+pushed V
+pushes V
+pushing V
+pushs V
+put V
+puts V
+putted V
+putting V
+questioned V
+questioning V
+quit V
+quits V
+quitting V
+race V
+raced V
+races V
+racing V
+ran V
+rang V
+reach V
+reached V
+reaching V
+reachs V
+read V
+readed V
+reading V
+reads V
+realize V
+realized V
+realizeed V
+realizeing V
+realizes V
+realizing V
+recall V
+recalled V
+recalling V
+recalls V
+receive V
+receiveed V
+receiveing V
+receives V
+recognize V
+recognized V
+recognizeed V
+recognizeing V
+recognizes V
+recognizing V
+recommend V
+recommended V
+recommending V
+recommends V
+reduce V
+reduceed V
+reduceing V
+reduces V
+refuse V
+refused V
+refuseed V
+refuseing V
+refuses V
+refusing V
+reject V
+rejecting V
+rejects V
+release V
+releaseed V
+releaseing V
+releases V
+rely V
+relyed V
+relying V
+relys V
+remain V
+remained V
+remaining V
+remains V
+remember V
+remembered V
+remembering V
+remembers V
+remind V
+reminded V
+reminding V
+reminds V
+remove V
+removed V
+removeed V
+removeing V
+removes V
+removing V
+repeat V
+repeated V
+repeating V
+repeats V
+reply V
+replyed V
+replying V
+replys V
+report V
+reported V
+reporting V
+reports V
+represent V
+represented V
+representing V
+represents V
+request V
+requested V
+requesting V
+requests V
+require V
+required V
+requireed V
+requireing V
+requires V
+requiring V
+rescue V
+rescueed V
+rescueing V
+rescues V
+research V
+researched V
+researching V
+researchs V
+reside V
+resideed V
+resideing V
+resides V
+respond V
+responded V
+responding V
+responds V
+rest V
+rested V
+resting V
+restrict V
+restricted V
+restricting V
+restricts V
+rests V
+result V
+resulted V
+resulting V
+results V
+return V
+returned V
+returning V
+returns V
+reveal V
+revealed V
+revealing V
+reveals V
+review V
+reviewed V
+reviewing V
+reviews V
+ridden V
+ride V
+rided V
+rides V
+riding V
+ringing V
+rings V
+rise V
+risen V
+rises V
+rising V
+rode V
+rose V
+row V
+rowed V
+rowing V
+rows V
+run V
+runed V
+rung V
+runing V
+runned V
+running V
+runs V
+rush V
+rushed V
+rushing V
+rushs V
+said V
+sail V
+sailed V
+sailing V
+sails V
+sang V
+sat V
+save V
+saveed V
+saveing V
+saves V
+saw V
+say V
+saying V
+says V
+sealed V
+search V
+searched V
+searching V
+searchs V
+see V
+seeing V
+seem V
+seemed V
+seeming V
+seems V
+seen V
+sees V
+sell V
+selling V
+sells V
+send V
+sended V
+sending V
+sends V
+sense V
+senseed V
+senseing V
+senses V
+sent V
+separate V
+separateed V
+separateing V
+separates V
+set V
+sets V
+setting V
+shake V
+shaked V
+shaken V
+shakes V
+shaking V
+share V
+shareed V
+shareing V
+shares V
+shine V
+shines V
+shining V
+shone V
+shook V
+shoot V
+shooting V
+shoots V
+shot V
+shout V
+shouted V
+shouting V
+shouts V
+show V
+showed V
+showing V
+shown V
+shows V
+shut V
+shuts V
+shutting V
+sing V
+singed V
+singing V
+sings V
+sit V
+sited V
+siting V
+sits V
+sitted V
+sitting V
+skip V
+skiped V
+skiping V
+skips V
+sleep V
+sleeping V
+sleeps V
+slept V
+slice V
+sliced V
+slices V
+slicing V
+slid V
+slide V
+slides V
+sliding V
+smell V
+smelled V
+smelling V
+smells V
+smile V
+smileed V
+smileing V
+smiles V
+sold V
+solve V
+solveed V
+solveing V
+solves V
+spat V
+speak V
+speaked V
+speaking V
+speaks V
+spend V
+spended V
+spending V
+spends V
+spent V
+spit V
+spits V
+spitting V
+split V
+splited V
+spliting V
+splits V
+splitting V
+spoke V
+spoken V
+spot V
+spoted V
+spoting V
+spots V
+sprang V
+spread V
+spreading V
+spreads V
+spring V
+springs V
+sprint V
+sprinted V
+sprinting V
+sprints V
+sprung V
+squeeze V
+squeezeed V
+squeezeing V
+squeezes V
+stand V
+standing V
+stands V
+stare V
+stareed V
+stareing V
+stares V
+start V
+started V
+starting V
+starts V
+stated V
+stating V
+stay V
+stayed V
+staying V
+stays V
+steal V
+stealing V
+steals V
+sting V
+stinging V
+stings V
+stir V
+stired V
+stiring V
+stirs V
+stole V
+stolen V
+stood V
+stop V
+stoped V
+stoping V
+stopped V
+stopping V
+stops V
+strike V
+strikes V
+striking V
+stroll V
+strolled V
+strolling V
+strolls V
+struck V
+studied V
+studies V
+study V
+studyed V
+studying V
+studys V
+stung V
+succeed V
+succeeded V
+succeeding V
+succeeds V
+suggest V
+suggested V
+suggesting V
+suggests V
+sung V
+support V
+supported V
+supporting V
+supports V
+suppose V
+supposed V
+supposes V
+supposing V
+swam V
+sweep V
+sweeping V
+sweeps V
+swept V
+swim V
+swimed V
+swiming V
+swimming V
+swims V
+swing V
+swinging V
+swings V
+swum V
+swung V
+take V
+taked V
+taken V
+takes V
+taking V
+talk V
+talked V
+talking V
+talks V
+taste V
+tasted V
+tasteed V
+tasteing V
+tastes V
+tasting V
+taught V
+teach V
+teached V
+teaches V
+teaching V
+teachs V
+tell V
+telling V
+tells V
+test V
+tested V
+testing V
+tests V
+thank V
+thanked V
+thanking V
+thanks V
+think V
+thinking V
+thinks V
+thought V
+threw V
+throw V
+throwing V
+thrown V
+throws V
+tick V
+ticked V
+ticking V
+ticks V
+told V
+took V
+touch V
+touched V
+touches V
+touching V
+touchs V
+trade V
+tradeed V
+tradeing V
+trades V
+train V
+trained V
+training V
+trains V
+transform V
+transformed V
+transforming V
+transforms V
+travel V
+traveled V
+traveling V
+travels V
+trip V
+tripped V
+tripping V
+trips V
+trust V
+trusted V
+trusting V
+trusts V
+turn V
+turned V
+turning V
+turns V
+typeed V
+typeing V
+types V
+understand V
+understanding V
+understands V
+understood V
+update V
+updateed V
+updateing V
+updates V
+use V
+used V
+uses V
+using V
+viewed V
+viewing V
+views V
+visit V
+visited V
+visiting V
+visits V
+wait V
+waited V
+waiting V
+waits V
+wake V
+wakes V
+waking V
+walk V
+walked V
+walking V
+walks V
+wander V
+wandered V
+wandering V
+wanders V
+want V
+wanted V
+wanting V
+wants V
+warn V
+warned V
+warning V
+warns V
+wash V
+washed V
+washing V
+washs V
+watched V
+watching V
+watchs V
+watered V
+watering V
+waters V
+wear V
+weared V
+wearing V
+wears V
+weep V
+weeping V
+weeps V
+welcome V
+welcomeed V
+welcomeing V
+welcomes V
+went V
+wept V
+whisper V
+whispered V
+whispering V
+whispers V
+win V
+winning V
+wins V
+wish V
+wished V
+wishing V
+wishs V
+woke V
+woken V
+won V
+wonder V
+wondered V
+wondering V
+wonders V
+wore V
+work V
+worked V
+working V
+works V
+worn V
+worries V
+worry V
+worrying V
+write V
+writeed V
+writeing V
+writes V
+writing V
+written V
+wrote V
+
+# ── N (nouns) ──
+ability N
+activist N
+actor N
+adult N
+africa N
+african N
+afternoon N
+agriculture N
+air N
+airport N
+airports N
+amount N
+ancestor N
+anger N
+animal N
+animals N
+ankle N
+ankles N
+answer N
+answers N
+ant N
+ants N
+apartment N
+apartments N
+ape N
+apes N
+architect N
+area N
+arm N
+arms N
+arrow N
+arrows N
+art N
+arteries N
+artery N
+artist N
+asante N
+ash N
+aspect N
+assignment N
+astronaut N
+athlete N
+attitude N
+aunt N
+average N
+baba N
+baby N
+bado N
+bag N
+bags N
+ball N
+balls N
+baraza N
+bay N
+bays N
+beach N
+beaches N
+bear N
+bears N
+beast N
+beasts N
+beauty N
+bed N
+beds N
+bee N
+beer N
+bees N
+behavior N
+belly N
+bike N
+bikes N
+bill N
+bills N
+bird N
+birds N
+blood N
+board N
+boat N
+boats N
+boma N
+bone N
+bones N
+book N
+books N
+boss N
+bottle N
+bottles N
+bow N
+bowl N
+bowls N
+bows N
+box N
+boxes N
+boy N
+bracelet N
+brain N
+branch N
+branches N
+bread N
+breakfast N
+bridge N
+bridges N
+brother N
+builder N
+builders N
+buildings N
+bus N
+buses N
+business N
+butterflies N
+butterfly N
+button N
+buttons N
+cable N
+cables N
+cake N
+camera N
+cameras N
+campus N
+captain N
+car N
+card N
+cards N
+cars N
+case N
+cases N
+cash N
+cat N
+cats N
+cause N
+causes N
+cave N
+caves N
+ceiling N
+ceilings N
+chai N
+chain N
+chains N
+chair N
+chairs N
+champion N
+chance N
+character N
+cheek N
+chef N
+chest N
+chicken N
+chickens N
+chief N
+child N
+children N
+chimpanzee N
+chimpanzees N
+chin N
+choice N
+church N
+churches N
+citizen N
+class N
+classmate N
+cliff N
+cliffs N
+climate N
+climber N
+climbers N
+clock N
+clocks N
+cloth N
+cloud N
+clouds N
+coach N
+coast N
+coasts N
+coat N
+coffee N
+coin N
+coins N
+collection N
+college N
+color N
+colours N
+community N
+computer N
+computers N
+condition N
+conditions N
+connection N
+connections N
+consultant N
+cooker N
+cookie N
+cookies N
+cost N
+costs N
+country N
+couple N
+court N
+courts N
+cousin N
+cow N
+cows N
+creature N
+creatures N
+criminal N
+critic N
+crocodile N
+crocodiles N
+crow N
+crows N
+culture N
+cup N
+cups N
+currents N
+dancer N
+dancers N
+darkness N
+data N
+daughter N
+dawn N
+day N
+days N
+death N
+deer N
+degree N
+dentist N
+depth N
+descendant N
+desert N
+deserts N
+designer N
+desk N
+desks N
+detective N
+developer N
+development N
+device N
+devices N
+dice N
+difference N
+differences N
+dinner N
+direction N
+director N
+dirt N
+distance N
+doctor N
+dog N
+dogs N
+dolphin N
+dolphins N
+door N
+doors N
+dorm N
+dream N
+dreams N
+dress N
+driver N
+drivers N
+duck N
+ducks N
+dusk N
+dust N
+eagle N
+eagles N
+ear N
+earring N
+ears N
+earth N
+eastern N
+economy N
+editor N
+education N
+effect N
+effects N
+elbow N
+elbows N
+eldoret N
+elephant N
+elephants N
+elk N
+employee N
+enemy N
+engine N
+engineer N
+engines N
+environment N
+evening N
+event N
+events N
+evil N
+exam N
+example N
+examples N
+experience N
+experiences N
+expert N
+eye N
+eyes N
+fabric N
+face N
+fact N
+factories N
+factory N
+failure N
+family N
+farmer N
+farmers N
+father N
+fear N
+feelings N
+feet N
+field N
+fields N
+finger N
+fingers N
+fire N
+fish N
+fisherman N
+fishermen N
+fishes N
+flame N
+floor N
+floors N
+flower N
+flowers N
+fog N
+food N
+foot N
+forehead N
+forest N
+forests N
+fork N
+forks N
+form N
+fox N
+foxes N
+freedom N
+friend N
+frog N
+frogs N
+fruit N
+fruits N
+game N
+games N
+garden N
+gardens N
+garissa N
+giraffe N
+giraffes N
+girl N
+githeri N
+glass N
+glasses N
+goal N
+goals N
+goat N
+goats N
+gold N
+gorilla N
+gorillas N
+government N
+grandchild N
+grandfather N
+grandmother N
+grandparent N
+grass N
+ground N
+group N
+growth N
+guard N
+guest N
+gun N
+guns N
+gym N
+gyms N
+hair N
+hall N
+hamster N
+hamsters N
+hand N
+hands N
+harambee N
+harbor N
+harbors N
+hare N
+hares N
+hat N
+hate N
+hawk N
+hawks N
+head N
+health N
+heart N
+heat N
+heel N
+heels N
+height N
+helicopter N
+helicopters N
+hen N
+hens N
+hero N
+highway N
+highways N
+hill N
+hills N
+hip N
+hippo N
+hippos N
+hips N
+history N
+home N
+homes N
+hope N
+horse N
+horses N
+hospital N
+hospitals N
+host N
+hostel N
+hotel N
+hotels N
+hour N
+hours N
+house N
+houses N
+hunter N
+hunters N
+husband N
+ice N
+idea N
+ideas N
+immigrant N
+improvement N
+industry N
+information N
+ink N
+insect N
+insects N
+iron N
+island N
+islands N
+item N
+items N
+jacket N
+jambo N
+jaw N
+joint N
+joints N
+journalist N
+joy N
+jua N
+judge N
+juice N
+jungle N
+jungles N
+justice N
+kakamega N
+kalenjin N
+kamba N
+karibu N
+kenya N
+key N
+keys N
+kid N
+kidney N
+kidneys N
+kikuyu N
+king N
+kisumu N
+knee N
+knees N
+knife N
+knives N
+knowledge N
+lake N
+lakes N
+lamp N
+lamps N
+land N
+language N
+laptop N
+laptops N
+law N
+lawyer N
+leader N
+leaders N
+leaf N
+lecture N
+lecturer N
+leg N
+legs N
+length N
+letter N
+letters N
+level N
+libraries N
+library N
+life N
+lightning N
+line N
+lines N
+lion N
+lions N
+lip N
+lips N
+list N
+listener N
+listeners N
+liver N
+lizard N
+lizards N
+location N
+lock N
+locks N
+loser N
+luck N
+luhya N
+lunch N
+lung N
+lungs N
+luo N
+maasai N
+machakos N
+machine N
+machines N
+majority N
+mama N
+man N
+manager N
+managers N
+mandazi N
+mara N
+market N
+markets N
+masai N
+matatu N
+meadow N
+meadows N
+meal N
+meals N
+meat N
+medicine N
+memories N
+memory N
+men N
+message N
+metal N
+method N
+methods N
+mice N
+middle N
+midnight N
+milk N
+minister N
+minority N
+minute N
+minutes N
+mirror N
+mirrors N
+mist N
+mmu N
+mombasa N
+moments N
+money N
+monkey N
+monkeys N
+month N
+months N
+moon N
+moose N
+morning N
+mosque N
+mosques N
+mosquito N
+mosquitoes N
+mother N
+motor N
+motors N
+mountain N
+mountains N
+mouse N
+mouth N
+mtoto N
+mud N
+muscle N
+muscles N
+museum N
+museums N
+music N
+musician N
+mzee N
+nail N
+nails N
+nairobi N
+nakuru N
+name N
+names N
+nature N
+ndugu N
+neck N
+necklace N
+neighbor N
+nephew N
+nerve N
+nerves N
+news N
+niece N
+night N
+noon N
+northern N
+nose N
+notebook N
+notebooks N
+number N
+numbers N
+nurse N
+nyanza N
+object N
+objects N
+ocean N
+oceans N
+office N
+officer N
+offices N
+oil N
+opinion N
+organization N
+owl N
+owls N
+owner N
+owners N
+painter N
+painters N
+pants N
+paper N
+papers N
+parent N
+park N
+parks N
+parrot N
+parrots N
+part N
+parts N
+party N
+path N
+paths N
+pattern N
+patterns N
+peace N
+pebble N
+pebbles N
+pen N
+pencil N
+pencils N
+penguin N
+penguins N
+pens N
+people N
+person N
+personality N
+pet N
+pets N
+pharmacist N
+phone N
+phones N
+photographer N
+piece N
+pieces N
+pig N
+pigs N
+pilot N
+pipe N
+pipes N
+place N
+plain N
+plains N
+plan N
+plane N
+planes N
+planet N
+planets N
+plans N
+plant N
+plants N
+plastic N
+plate N
+plateau N
+plateaus N
+plates N
+player N
+players N
+point N
+pole N
+police N
+politics N
+pond N
+ponds N
+pool N
+pools N
+port N
+ports N
+position N
+power N
+president N
+price N
+prices N
+prince N
+princess N
+principal N
+problem N
+problems N
+process N
+processes N
+professor N
+programmer N
+progress N
+project N
+publisher N
+pupil N
+purpose N
+purse N
+quality N
+quantity N
+queen N
+question N
+questions N
+rabbit N
+rabbits N
+radio N
+radios N
+rafiki N
+rain N
+range N
+rat N
+rats N
+reader N
+readers N
+reason N
+reasons N
+refugee N
+region N
+registration N
+relationship N
+relationships N
+relative N
+religion N
+reporter N
+restaurant N
+restaurants N
+rib N
+ribs N
+rice N
+rift N
+ring N
+river N
+rivers N
+road N
+roads N
+rock N
+roof N
+roofs N
+rooster N
+roosters N
+root N
+roots N
+rope N
+ropes N
+runner N
+runners N
+sadness N
+safari N
+sailor N
+salad N
+salt N
+sand N
+savanna N
+savannah N
+sawa N
+school N
+schools N
+science N
+scientist N
+screen N
+screens N
+sea N
+seal N
+seals N
+seas N
+second N
+seconds N
+seed N
+seeds N
+semester N
+sentence N
+sentences N
+shadow N
+shamba N
+shape N
+shapes N
+shark N
+sharks N
+sheep N
+ship N
+ships N
+shirt N
+shirts N
+shoes N
+shop N
+shops N
+shore N
+shores N
+shoulder N
+shoulders N
+side N
+sides N
+sign N
+signs N
+similarities N
+similarity N
+singer N
+singers N
+sister N
+situation N
+situations N
+size N
+skill N
+skin N
+skull N
+sky N
+smoke N
+snack N
+snacks N
+snake N
+snakes N
+snow N
+society N
+sofa N
+sofas N
+soil N
+soldier N
+solution N
+solutions N
+somali N
+son N
+soup N
+sparrow N
+sparrows N
+speaker N
+speakers N
+specialist N
+speed N
+spice N
+spices N
+spider N
+spiders N
+spine N
+spoon N
+spoons N
+squirrel N
+squirrels N
+stadium N
+stadiums N
+staff N
+stage N
+stages N
+stairs N
+star N
+stars N
+state N
+states N
+station N
+stations N
+steel N
+step N
+steps N
+stomach N
+stone N
+stones N
+store N
+stores N
+storm N
+story N
+stranger N
+stream N
+streams N
+street N
+streets N
+strength N
+structure N
+structures N
+student N
+style N
+success N
+sugar N
+suit N
+sukuma N
+sun N
+sunrise N
+sunset N
+supporter N
+surface N
+surfaces N
+surgeon N
+survivor N
+suspect N
+swahili N
+swamp N
+swamps N
+swimmer N
+swimmers N
+switch N
+switches N
+sword N
+swords N
+symbol N
+symbols N
+system N
+systems N
+table N
+tables N
+tablet N
+tablets N
+tea N
+teacher N
+teachers N
+team N
+technology N
+teen N
+teenager N
+teeth N
+television N
+temperature N
+temple N
+temples N
+text N
+texts N
+therapist N
+thesis N
+thika N
+thing N
+things N
+thoughts N
+throat N
+thumb N
+thumbs N
+thunder N
+tide N
+tides N
+tiger N
+tigers N
+time N
+times N
+toad N
+toads N
+toe N
+toes N
+tongue N
+tool N
+tools N
+tooth N
+tourist N
+toy N
+toys N
+tradition N
+trainer N
+traveler N
+tree N
+trees N
+truck N
+trucks N
+truth N
+turkana N
+turkey N
+turkeys N
+turtle N
+turtles N
+tv N
+type N
+ugali N
+uhuru N
+uncle N
+uniform N
+university N
+valley N
+valleys N
+value N
+values N
+van N
+vans N
+vegetable N
+vegetables N
+vein N
+veins N
+victim N
+view N
+villain N
+visitor N
+visitors N
+volcano N
+volcanoes N
+volunteer N
+wall N
+wallet N
+walls N
+war N
+watch N
+water N
+waterfall N
+waterfalls N
+wave N
+waves N
+weakness N
+weapon N
+weapons N
+weather N
+week N
+weeks N
+weight N
+western N
+whale N
+whales N
+width N
+wife N
+wildlife N
+wind N
+window N
+windows N
+wine N
+winner N
+wire N
+wires N
+wisdom N
+witness N
+wolf N
+wolves N
+woman N
+women N
+wood N
+word N
+words N
+worker N
+workers N
+world N
+worm N
+worms N
+wrist N
+wrists N
+writer N
+writers N
+wrong N
+year N
+years N
+zebra N
+zebras N
+zone N
+
+# ── ADJ (adjectives) ──
+able ADJ
+absent ADJ
+academic ADJ
+additional ADJ
+advanced ADJ
+afraid ADJ
+alive ADJ
+aliver ADJ
+alivest ADJ
+amazing ADJ
+analytical ADJ
+ancient ADJ
+angrier ADJ
+angriest ADJ
+angry ADJ
+annual ADJ
+anxious ADJ
+approved ADJ
+ashamed ADJ
+available ADJ
+awful ADJ
+bad ADJ
+basic ADJ
+beige ADJ
+best ADJ
+better ADJ
+big ADJ
+bigger ADJ
+biggest ADJ
+biological ADJ
+black ADJ
+blue ADJ
+blunt ADJ
+bony ADJ
+bored ADJ
+bossy ADJ
+bottom ADJ
+bounty ADJ
+brave ADJ
+braver ADJ
+bravest ADJ
+breezy ADJ
+brief ADJ
+bright ADJ
+broad ADJ
+brown ADJ
+bully ADJ
+bumpy ADJ
+burly ADJ
+busier ADJ
+busiest ADJ
+busty ADJ
+busy ADJ
+calm ADJ
+capable ADJ
+central ADJ
+chemical ADJ
+chilly ADJ
+circular ADJ
+classic ADJ
+classy ADJ
+clean ADJ
+cleanr ADJ
+cleanst ADJ
+clear ADJ
+clever ADJ
+closer ADJ
+closest ADJ
+clumpy ADJ
+cold ADJ
+colder ADJ
+coldest ADJ
+collective ADJ
+colorful ADJ
+colourful ADJ
+comfortable ADJ
+common ADJ
+complete ADJ
+complex ADJ
+confused ADJ
+cool ADJ
+cooler ADJ
+coolest ADJ
+coral ADJ
+correct ADJ
+costly ADJ
+cosy ADJ
+countless ADJ
+county ADJ
+cowardly ADJ
+cozy ADJ
+crazy ADJ
+cream ADJ
+creamy ADJ
+creative ADJ
+crimson ADJ
+crinkly ADJ
+critical ADJ
+crude ADJ
+cruder ADJ
+crudest ADJ
+cruel ADJ
+crusty ADJ
+cultural ADJ
+curious ADJ
+curly ADJ
+current ADJ
+curved ADJ
+cyan ADJ
+dainty ADJ
+dark ADJ
+dead ADJ
+deep ADJ
+deeper ADJ
+deepest ADJ
+detailed ADJ
+diagonal ADJ
+dicey ADJ
+digital ADJ
+dirtier ADJ
+dirtiest ADJ
+dirty ADJ
+dishonest ADJ
+distant ADJ
+double ADJ
+dreamy ADJ
+drier ADJ
+driest ADJ
+dry ADJ
+dusty ADJ
+earthy ADJ
+easier ADJ
+easiest ADJ
+easy ADJ
+economic ADJ
+educational ADJ
+electrical ADJ
+electronic ADJ
+empirical ADJ
+empty ADJ
+enormous ADJ
+environmental ADJ
+essential ADJ
+ethical ADJ
+eventual ADJ
+excellent ADJ
+excited ADJ
+experimental ADJ
+extra ADJ
+familiar ADJ
+fancy ADJ
+fantastic ADJ
+fat ADJ
+fatter ADJ
+fattest ADJ
+filthy ADJ
+final ADJ
+fine ADJ
+finer ADJ
+finest ADJ
+fixed ADJ
+flat ADJ
+flighty ADJ
+flimsy ADJ
+fluffy ADJ
+foamy ADJ
+foreign ADJ
+formal ADJ
+freckly ADJ
+frequent ADJ
+fresh ADJ
+friendly ADJ
+front ADJ
+frosty ADJ
+full ADJ
+fundamental ADJ
+funnier ADJ
+funniest ADJ
+funny ADJ
+fussy ADJ
+future ADJ
+general ADJ
+generous ADJ
+genetic ADJ
+gentle ADJ
+ghostly ADJ
+giant ADJ
+glad ADJ
+gladder ADJ
+gladdest ADJ
+global ADJ
+gloomy ADJ
+gnarly ADJ
+golden ADJ
+good ADJ
+gradual ADJ
+grateful ADJ
+gray ADJ
+greasy ADJ
+great ADJ
+greater ADJ
+greatest ADJ
+greedy ADJ
+green ADJ
+grey ADJ
+grizzly ADJ
+grumpy ADJ
+guilty ADJ
+gusty ADJ
+happier ADJ
+happiest ADJ
+happy ADJ
+harder ADJ
+hardest ADJ
+hazy ADJ
+healthier ADJ
+healthiest ADJ
+healthy ADJ
+heavier ADJ
+heaviest ADJ
+heavy ADJ
+high ADJ
+higher ADJ
+highest ADJ
+hilly ADJ
+historical ADJ
+hollow ADJ
+holy ADJ
+honest ADJ
+horizontal ADJ
+horny ADJ
+hot ADJ
+hotter ADJ
+hottest ADJ
+huge ADJ
+huger ADJ
+hugest ADJ
+hungrier ADJ
+hungriest ADJ
+hungry ADJ
+icy ADJ
+ighty ADJ
+ill ADJ
+immediate ADJ
+impatient ADJ
+incorrect ADJ
+incredible ADJ
+indigo ADJ
+individual ADJ
+indoor ADJ
+infinite ADJ
+informal ADJ
+inner ADJ
+instant ADJ
+intelligent ADJ
+international ADJ
+invalid ADJ
+ivory ADJ
+jealous ADJ
+jolly ADJ
+juicy ADJ
+kind ADJ
+large ADJ
+larger ADJ
+largest ADJ
+lazy ADJ
+legal ADJ
+lengthy ADJ
+light ADJ
+limited ADJ
+linguistic ADJ
+literary ADJ
+littler ADJ
+littlest ADJ
+lively ADJ
+local ADJ
+lonely ADJ
+long ADJ
+longer ADJ
+longest ADJ
+lovely ADJ
+low ADJ
+lower ADJ
+lowest ADJ
+loyal ADJ
+luckier ADJ
+luckiest ADJ
+lucky ADJ
+lumpy ADJ
+mad ADJ
+madder ADJ
+maddest ADJ
+magenta ADJ
+main ADJ
+major ADJ
+maroon ADJ
+massive ADJ
+mathematical ADJ
+mechanical ADJ
+medical ADJ
+melted ADJ
+messier ADJ
+messiest ADJ
+messy ADJ
+microscopic ADJ
+mighty ADJ
+mini ADJ
+minor ADJ
+missing ADJ
+misty ADJ
+modern ADJ
+moment ADJ
+mossy ADJ
+mousey ADJ
+multiple ADJ
+musty ADJ
+narrow ADJ
+narrower ADJ
+narrowest ADJ
+national ADJ
+navy ADJ
+nervous ADJ
+new ADJ
+nice ADJ
+nicer ADJ
+nicest ADJ
+nighty ADJ
+noble ADJ
+noisier ADJ
+noisiest ADJ
+noisy ADJ
+normal ADJ
+nuclear ADJ
+numerous ADJ
+occasional ADJ
+odd ADJ
+official ADJ
+old ADJ
+optional ADJ
+orange ADJ
+ordinary ADJ
+original ADJ
+outdoor ADJ
+outer ADJ
+pale ADJ
+parallel ADJ
+partial ADJ
+patient ADJ
+perfect ADJ
+permanent ADJ
+personal ADJ
+philosophical ADJ
+phony ADJ
+physical ADJ
+pink ADJ
+plenty ADJ
+pointy ADJ
+polite ADJ
+politer ADJ
+politest ADJ
+political ADJ
+poor ADJ
+poorer ADJ
+poorest ADJ
+posy ADJ
+practical ADJ
+present ADJ
+previous ADJ
+pricey ADJ
+prickly ADJ
+primary ADJ
+private ADJ
+professional ADJ
+proud ADJ
+public ADJ
+puffy ADJ
+pure ADJ
+purer ADJ
+purest ADJ
+purple ADJ
+quick ADJ
+rainbow ADJ
+rapid ADJ
+rare ADJ
+raw ADJ
+recent ADJ
+rectangular ADJ
+red ADJ
+regular ADJ
+rejected ADJ
+relaxed ADJ
+religious ADJ
+remote ADJ
+rich ADJ
+richer ADJ
+richest ADJ
+ripe ADJ
+riper ADJ
+ripest ADJ
+roomy ADJ
+rosy ADJ
+round ADJ
+rude ADJ
+ruder ADJ
+rudest ADJ
+rural ADJ
+rusty ADJ
+sad ADJ
+sadder ADJ
+saddest ADJ
+safe ADJ
+safer ADJ
+safest ADJ
+salmon ADJ
+sassy ADJ
+scanty ADJ
+scarier ADJ
+scariest ADJ
+scarlet ADJ
+scary ADJ
+scientific ADJ
+secondary ADJ
+selfish ADJ
+serious ADJ
+shallow ADJ
+shallower ADJ
+shallowest ADJ
+sharp ADJ
+shiny ADJ
+short ADJ
+shorter ADJ
+shortest ADJ
+sick ADJ
+silly ADJ
+silver ADJ
+simple ADJ
+single ADJ
+skinny ADJ
+slim ADJ
+slimmer ADJ
+slimmest ADJ
+small ADJ
+smaller ADJ
+smallest ADJ
+smart ADJ
+social ADJ
+soft ADJ
+softer ADJ
+softest ADJ
+solid ADJ
+spare ADJ
+sparkly ADJ
+special ADJ
+specific ADJ
+spicy ADJ
+square ADJ
+stable ADJ
+stale ADJ
+stealthy ADJ
+steamy ADJ
+stony ADJ
+stormy ADJ
+straight ADJ
+strange ADJ
+stressed ADJ
+stuffy ADJ
+sudden ADJ
+suitable ADJ
+surly ADJ
+surprised ADJ
+swift ADJ
+tall ADJ
+taller ADJ
+tallest ADJ
+tastier ADJ
+tastiest ADJ
+tasty ADJ
+teal ADJ
+technical ADJ
+temporary ADJ
+terrible ADJ
+theoretical ADJ
+thick ADJ
+thicker ADJ
+thickest ADJ
+thin ADJ
+thinner ADJ
+thinnest ADJ
+thorny ADJ
+tighty ADJ
+tiny ADJ
+tired ADJ
+toasty ADJ
+top ADJ
+total ADJ
+tough ADJ
+tougher ADJ
+toughest ADJ
+traditional ADJ
+transparent ADJ
+triangular ADJ
+trickier ADJ
+trickiest ADJ
+tricky ADJ
+turquoise ADJ
+typical ADJ
+uglier ADJ
+ugliest ADJ
+ugly ADJ
+underground ADJ
+unique ADJ
+universal ADJ
+unusual ADJ
+urban ADJ
+valid ADJ
+various ADJ
+vast ADJ
+vertical ADJ
+violent ADJ
+violet ADJ
+warm ADJ
+warmer ADJ
+warmest ADJ
+wavy ADJ
+wealthy ADJ
+weird ADJ
+wet ADJ
+wetter ADJ
+wettest ADJ
+white ADJ
+whole ADJ
+wide ADJ
+wider ADJ
+widest ADJ
+wise ADJ
+wiser ADJ
+wisest ADJ
+wonderful ADJ
+woolly ADJ
+wormy ADJ
+worried ADJ
+worse ADJ
+worst ADJ
+worthy ADJ
+wrinkly ADJ
+yellow ADJ
+young ADJ
+
+# ── ADV (adverbs) ──
+abroad ADV
+academically ADV
+actually ADV
+again ADV
+ago ADV
+ahead ADV
+almost ADV
+already ADV
+always ADV
+annually ADV
+approximately ADV
+artificially ADV
+automatically ADV
+away ADV
+back ADV
+badly ADV
+barely ADV
+broadly ADV
+carefully ADV
+carelessly ADV
+closely ADV
+completely ADV
+constantly ADV
+continuously ADV
+creatively ADV
+culturally ADV
+currently ADV
+daily ADV
+deeply ADV
+directly ADV
+downstairs ADV
+early ADV
+easily ADV
+east ADV
+effectively ADV
+emotionally ADV
+entirely ADV
+especially ADV
+essentially ADV
+extremely ADV
+fairly ADV
+far ADV
+fast ADV
+financially ADV
+firmly ADV
+first ADV
+formally ADV
+formerly ADV
+fortunately ADV
+forward ADV
+frequently ADV
+fully ADV
+generally ADV
+gently ADV
+globally ADV
+gradually ADV
+hard ADV
+hardly ADV
+heavily ADV
+highly ADV
+ideally ADV
+immediately ADV
+importantly ADV
+incredibly ADV
+independently ADV
+indirectly ADV
+informally ADV
+instantly ADV
+interestingly ADV
+inward ADV
+ironically ADV
+largely ADV
+late ADV
+lately ADV
+legally ADV
+lightly ADV
+locally ADV
+loosely ADV
+loudly ADV
+luckily ADV
+mainly ADV
+manually ADV
+mentally ADV
+monthly ADV
+mostly ADV
+nationwide ADV
+naturally ADV
+nearly ADV
+never ADV
+next ADV
+normally ADV
+north ADV
+occasionally ADV
+officially ADV
+often ADV
+only ADV
+openly ADV
+outward ADV
+particularly ADV
+partly ADV
+personally ADV
+physically ADV
+politically ADV
+practically ADV
+precisely ADV
+presently ADV
+previously ADV
+professionally ADV
+publicly ADV
+purely ADV
+quickly ADV
+quietly ADV
+quite ADV
+rapidly ADV
+rarely ADV
+rather ADV
+recently ADV
+regularly ADV
+repeatedly ADV
+roughly ADV
+scientifically ADV
+secretly ADV
+seldom ADV
+sharply ADV
+sideways ADV
+significantly ADV
+slow ADV
+slowly ADV
+smoothly ADV
+socially ADV
+softly ADV
+sometimes ADV
+soon ADV
+south ADV
+still ADV
+strongly ADV
+suddenly ADV
+surprisingly ADV
+technically ADV
+then ADV
+theoretically ADV
+tightly ADV
+today ADV
+together ADV
+tomorrow ADV
+tonight ADV
+too ADV
+totally ADV
+truly ADV
+typically ADV
+upstairs ADV
+usually ADV
+very ADV
+weakly ADV
+weekly ADV
+west ADV
+widely ADV
+worldwide ADV
+yearly ADV
+yesterday ADV
+
+```
 
 ## File: `docs/AGENT.md`
 
@@ -1717,6 +5570,356 @@ Copy-paste the following two phase blocks into `ROADMAP.md` after Phase 6.
 
 ```
 
+## File: `docs/plan.md`
+
+```markdown
+# Dictionary System Plan
+## How to make the parser handle any word — including Kenyan names, uni jargon, and slang
+
+---
+
+## The Core Problem (and why a bigger list alone won't fully solve it)
+
+English has ~170,000 active words, but **no dictionary can be complete forever**. New names, slang, technical terms, and proper nouns (Maasai Mara, KU, Strathmore, Matatu, Harambee...) will always appear. The real fix is a **layered system** where the dictionary handles known words, smart heuristics handle patterns, and anything left over defaults safely to **Noun (N)** — because unknown words used in a sentence are almost always acting as nouns.
+
+---
+
+## The 3-Layer Architecture
+
+```
+Input word
+    │
+    ▼
+Layer 1: Dictionary Lookup          ← dictionary.txt (3800+ entries, exact match)
+    │  Found? → return that POS
+    │  Not found?
+    ▼
+Layer 2: Suffix Heuristics          ← patterns in lexer.cpp
+    │  -ing → V      (running, sleeping, building)
+    │  -ly  → ADV    (quickly, slowly, beautifully)   [min 4 chars — "fly" is NOT ADV]
+    │  -ed  → V      (walked, talked, jumped)
+    │  -tion/-ness/-ment → N   (action, happiness, payment)
+    │  Uppercase mid-sentence → PROPER_N  (Nairobi, Fawzy, Maasai)
+    │  Not matched?
+    ▼
+Layer 3: Default fallback           ← lexer.cpp
+    └── return N                    ← ALWAYS noun for unknown words
+```
+
+This means:
+- **"Maasai"** → not in dict → uppercase mid-sentence → **PROPER_N** ✓  
+- **"matatu"** → not in dict → no suffix match → **N** (treated as noun) ✓  
+- **"Strathmore"** → not in dict → uppercase → **PROPER_N** ✓  
+- **"ugali"** → not in dict → **N** ✓  
+- **"kicking"** → not in dict → ends in -ing → **V** ✓  
+- **"governmental"** → not in dict → no suffix match → **N** (acceptable fallback)
+
+---
+
+## Step 1: Replace the hardcoded dictionary in `pos_dict.cpp`
+
+The current `pos_dict.cpp` has a `static const unordered_map` baked into the source code with ~100 words. **Replace the entire file** with the version below that:
+1. Loads `data/dictionary.txt` at startup
+2. Falls back gracefully if the file is missing
+3. Returns `POS::UNKNOWN` for unlisted words (lexer then applies heuristics)
+
+### New `src/pos_dict.cpp`
+
+```cpp
+#include "pos_dict.h"
+#include <unordered_map>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <algorithm>
+
+// Runtime dictionary — populated by load_dictionary()
+static std::unordered_map<std::string, POS> DICTIONARY;
+
+std::string pos_to_str(POS tag) {
+    switch(tag) {
+        case POS::DET:     return "DET";
+        case POS::N:       return "N";
+        case POS::V:       return "V";
+        case POS::ADJ:     return "ADJ";
+        case POS::ADV:     return "ADV";
+        case POS::PREP:    return "PREP";
+        case POS::PRON:    return "PRON";
+        case POS::CONJ:    return "CONJ";
+        case POS::AUX:     return "AUX";
+        case POS::NUM:     return "NUM";
+        case POS::PROPER_N:return "PROPER_N";
+        case POS::OP:      return "OP";
+        case POS::LPAREN:  return "LPAREN";
+        case POS::RPAREN:  return "RPAREN";
+        case POS::UNKNOWN: return "UNKNOWN";
+        default:           return "UNKNOWN";
+    }
+}
+
+POS str_to_pos(const std::string& s) {
+    if (s == "DET")      return POS::DET;
+    if (s == "N")        return POS::N;
+    if (s == "V")        return POS::V;
+    if (s == "ADJ")      return POS::ADJ;
+    if (s == "ADV")      return POS::ADV;
+    if (s == "PREP")     return POS::PREP;
+    if (s == "PRON")     return POS::PRON;
+    if (s == "CONJ")     return POS::CONJ;
+    if (s == "AUX")      return POS::AUX;
+    if (s == "NUM")      return POS::NUM;
+    if (s == "PROPER_N") return POS::PROPER_N;
+    if (s == "INTJ")     return POS::INTJ;
+    return POS::UNKNOWN;
+}
+
+void load_dictionary(const std::string& filename) {
+    // Seed with minimal fallback so parser works even without the file
+    DICTIONARY = {
+        {"the",POS::DET},{"a",POS::DET},{"an",POS::DET},
+        {"is",POS::AUX},{"are",POS::AUX},{"was",POS::AUX},
+        {"he",POS::PRON},{"she",POS::PRON},{"it",POS::PRON},
+        {"they",POS::PRON},{"i",POS::PRON},{"you",POS::PRON},
+        {"we",POS::PRON},{"him",POS::PRON},{"her",POS::DET},
+        {"and",POS::CONJ},{"but",POS::CONJ},{"or",POS::CONJ},
+        {"in",POS::PREP},{"on",POS::PREP},{"at",POS::PREP},
+        {"to",POS::PREP},{"over",POS::PREP},{"with",POS::PREP},
+    };
+
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Warning: dictionary file '" << filename
+                  << "' not found. Parser will use suffix heuristics only.\n";
+        return;
+    }
+
+    std::string line;
+    int loaded = 0;
+    while (std::getline(file, line)) {
+        // Strip comments (# to end of line)
+        auto hash = line.find('#');
+        if (hash != std::string::npos) line = line.substr(0, hash);
+
+        std::istringstream iss(line);
+        std::string word, tag_str;
+        if (!(iss >> word >> tag_str)) continue;
+
+        POS tag = str_to_pos(tag_str);
+        if (tag == POS::UNKNOWN) continue;
+
+        // Lowercase all keys — lookup is always case-insensitive
+        std::transform(word.begin(), word.end(), word.begin(),
+            [](unsigned char c){ return std::tolower(c); });
+        DICTIONARY[word] = tag;
+        loaded++;
+    }
+    std::cerr << "Loaded " << loaded << " dictionary entries from " << filename << "\n";
+}
+
+POS lookup_word(const std::string& word) {
+    auto it = DICTIONARY.find(word);
+    return (it != DICTIONARY.end()) ? it->second : POS::UNKNOWN;
+}
+```
+
+### Updated `src/lexer.cpp` — assign_pos fallback fix
+
+Change the last line of `assign_pos()` from returning `POS::UNKNOWN` to returning `POS::N`:
+
+```cpp
+POS Lexer::assign_pos(const std::string& word, bool is_first_word) {
+    if (word.empty()) return POS::UNKNOWN;
+
+    // --- operator / numeric tokens ---
+    if (word == "+" || word == "-" || word == "*" || word == "/") return POS::OP;
+    if (word == "(") return POS::LPAREN;
+    if (word == ")") return POS::RPAREN;
+    bool all_digits = true;
+    for (char c : word) if (!std::isdigit(c)) { all_digits = false; break; }
+    if (all_digits) return POS::NUM;
+
+    // --- dictionary lookup (case-insensitive) ---
+    std::string lower = word;
+    std::transform(lower.begin(), lower.end(), lower.begin(),
+                   [](unsigned char c){ return std::tolower(c); });
+    POS tag = lookup_word(lower);
+    if (tag != POS::UNKNOWN) return tag;
+
+    // --- suffix heuristics (for words NOT in dictionary) ---
+    if (lower.size() > 3 && lower.substr(lower.size()-3) == "ing") return POS::V;
+    if (lower.size() >= 4 && lower.substr(lower.size()-2) == "ly")  return POS::ADV;
+    if (lower.size() > 2 && lower.substr(lower.size()-2) == "ed")   return POS::V;
+    if (lower.size() > 4 &&
+       (lower.substr(lower.size()-4) == "tion" ||
+        lower.substr(lower.size()-4) == "ness" ||
+        lower.substr(lower.size()-4) == "ment"))                    return POS::N;
+
+    // Capitalised mid-sentence → proper noun (Nairobi, Fawzy, Maasai)
+    if (!is_first_word && std::isupper(word[0])) return POS::PROPER_N;
+
+    // ── FINAL FALLBACK: unknown words are treated as Nouns ──
+    // Names (Wanjiku, Kipchoge, Strathmore), slang (matatu, ugali),
+    // technical terms — all work as nouns in a parse tree.
+    return POS::N;
+}
+```
+
+> **The `-ly` fix** on line 4 of the heuristics changes `> 2` to `>= 4`. Without this, the 3-letter word "fly" was matched as ADV (`f-l-y` ends in `ly`). With the fix, only words 4+ characters long get the ADV treatment.
+
+---
+
+## Step 2: Update `main.cpp` to call `load_dictionary()`
+
+Add one line near the top of `main()` before the Lexer is created:
+
+```cpp
+int main(int argc, char* argv[]) {
+    // ── load dictionary at startup ──
+    load_dictionary("data/dictionary.txt");
+    // ... rest of main unchanged
+```
+
+Make sure `#include "pos_dict.h"` is at the top of `main.cpp` — it likely already is.
+
+---
+
+## Step 3: Place the dictionary file
+
+Put `dictionary.txt` in the `data/` folder of your project:
+
+```
+cpp-Project/
+├── data/
+│   └── dictionary.txt    ← 3800+ entries, this file
+├── src/
+│   ├── pos_dict.cpp      ← updated (loads from file)
+│   ├── lexer.cpp         ← updated (N fallback + -ly fix)
+│   └── main.cpp          ← updated (calls load_dictionary)
+└── ...
+```
+
+Rebuild with:
+```bash
+g++ -std=c++17 src/*.cpp -Iinclude -o english-parser
+./english-parser "The quick brown fox jumps over the lazy dog"
+```
+
+---
+
+## Step 4: How to add new words yourself
+
+The dictionary file is plain text — one word per line, format: `word TAG`. Comments start with `#`.
+
+**Example — adding Kenyan/local words:**
+```text
+# ── Kenyan / local words ──
+nairobi N
+mombasa N
+kisumu N
+maasai PROPER_N
+kikkikuyu PROPER_N
+matatu N
+boda N
+ugali N
+sukuma N
+harambee N
+safari N
+mzungu N
+wanjiku PROPER_N
+kipchoge PROPER_N
+mmu N
+strathmore N
+kenyatta N
+maseno N
+egerton N
+```
+
+**Example — adding your university's terminology:**
+```text
+cat N
+cat V
+cdf N
+assignment N
+semester N
+transcript N
+coursework N
+elective N
+prerequisite N
+internship N
+dissertation N
+```
+
+**Example — fixing a misclassified word:**
+If "data" is parsing wrong (it's a plural noun but sometimes used as non-count):
+```text
+data N
+datum N
+```
+
+**Rules for adding entries:**
+1. One word per line, lowercase
+2. Use exactly one tag: `DET N V ADJ ADV PREP PRON CONJ AUX NUM PROPER_N`
+3. Lines starting with `#` are comments — use them to organise sections
+4. Later entries in the file overwrite earlier ones for the same word
+5. Put your custom additions at the **bottom** of the file under `# ── CUSTOM ──`
+
+---
+
+## Step 5: When a word still fails (debugging guide)
+
+If a sentence fails to parse, the problem is almost always a wrong POS tag. Find which word is wrong using this mental checklist:
+
+| Symptom | What to check |
+|---------|---------------|
+| Parser returns null for `"X verbs"` | Is the verb (e.g. "loves", "drinks") tagged V? Check it's in `dictionary.txt` under V. |
+| A noun is being treated as a verb | That word was given V tag in dict. Add it: `wordname N` at bottom of dict. |
+| "fly" tagged as ADV | You have the old `> 2` check in `assign_pos`. Change it to `>= 4`. |
+| Name like "Nairobi" tagged as N not PROPER_N | It's the first word of the sentence — the uppercase heuristic skips position 0. Add it: `nairobi PROPER_N`. |
+| Slang word breaks parse | It's probably UNKNOWN → now defaults to N. If it's acting as a verb (e.g. "vibing"), add `vibing V` to dict. |
+| Sentence with "his/her/their" fails NP rule | These are DET in the grammar, not PRON. Both are in the dict as DET. |
+
+---
+
+## Why unknown words default to N (not UNKNOWN)
+
+The parser's grammar rules use POS tags to match tokens. If a word is tagged `UNKNOWN`, no grammar rule ever matches it, and the entire parse fails even if the rest of the sentence is perfect.
+
+Defaulting to `N` means:
+- **"Wanjiku runs"** → `PROPER_N V` → parser tries `NP(PROPER_N) VP(V)` → **succeeds** ✓  
+- **"The matatu runs"** → `DET N V` → `NP(DET N) VP(V)` → **succeeds** ✓  
+- **"Harambee builds communities"** → `N V N` → `NP(N) VP(V NP(N))` → **succeeds** ✓  
+- **"jabberwocky"** → `N` → can serve as subject or object ✓
+
+The only case where this fails is if an unknown word is *actually* functioning as a verb, adjective, or preposition in the sentence. In practice, proper names and new nouns appear far more frequently than unknown verbs (which almost always have recognisable -ing/-ed suffixes anyway).
+
+---
+
+## Dictionary Coverage Summary
+
+The generated `dictionary.txt` contains **3,812 entries** covering:
+
+| POS Tag | Count | What's covered |
+|---------|-------|----------------|
+| V       | 1,689 | ~400 verbs × base/3ps/past/pp/ing forms; all irregular verbs explicit |
+| N       | 1,056 | People, body, animals, nature, objects, abstract, African/Kenyan terms |
+| ADJ     | 547   | Size, color, emotion, temporal, spatial, academic/technical |
+| ADV     | 160   | Degree, frequency, time, place, manner |
+| PRON    | 57    | All personal, demonstrative, relative, indefinite pronouns |
+| DET     | 38    | Articles, possessives, quantifiers |
+| PREP    | 67    | All English prepositions |
+| CONJ    | 64    | Coordinating + subordinating conjunctions |
+| AUX     | 44    | All modal + be/have/do forms |
+| NUM     | 44    | Number words (one–trillion, ordinals) |
+| INTJ    | 46    | Interjections (oh, wow, hey, etc.) |
+
+**What it doesn't cover** (handled by fallback):
+- Archaic or highly specialised vocabulary
+- Proper nouns (people's names, place names) → PROPER_N via uppercase heuristic
+- New slang / Swahili / local words → N via default fallback
+- Novel compound words → N via default fallback
+
+```
+
 ## File: `include/bottom_up_parser.h`
 
 ```c
@@ -1834,10 +6037,12 @@ struct ParseNode {
 #include <string>
 
 enum class POS {
-    DET, N, V, ADJ, ADV, PREP, PRON, CONJ, AUX, NUM, PROPER_N, OP, LPAREN, RPAREN, UNKNOWN
+    DET, N, V, ADJ, ADV, PREP, PRON, CONJ, AUX, NUM, PROPER_N, OP, LPAREN, RPAREN, INTJ, UNKNOWN
 };
 
 std::string pos_to_str(POS tag);
+POS str_to_pos(const std::string& s);
+void load_dictionary(const std::string& filename);
 POS lookup_word(const std::string& word);
 
 ```
@@ -1956,6 +6161,7 @@ fi
 ```cpp
 #include "bottom_up_parser.h"
 #include <algorithm>
+#include <iostream>
 
 BottomUpParser::BottomUpParser(const std::vector<Token>& tokens) 
     : tokens_(tokens), input_pos_(0) {}
@@ -2024,14 +6230,23 @@ bool BottomUpParser::try_reduce() {
     // by looking ahead. Let's do a simple 1-token lookahead to avoid reducing VP too early
     // when a PP could be formed.
     
-    if (stack_top_matches({"V", "NP"}) || stack_top_matches({"V"}) || stack_top_matches({"AUX", "V"})) {
+    if (stack_top_matches({"V", "NP"}) || stack_top_matches({"V"}) || stack_top_matches({"AUX", "V"}) || stack_top_matches({"AUX", "NP"})) {
         if (!at_end() && (pos_to_str(tokens_[input_pos_].tag) == "PREP" || 
                           pos_to_str(tokens_[input_pos_].tag) == "PRON" ||
                           pos_to_str(tokens_[input_pos_].tag) == "DET" ||
                           pos_to_str(tokens_[input_pos_].tag) == "ADJ" ||
+                          pos_to_str(tokens_[input_pos_].tag) == "PROPER_N" ||
                           pos_to_str(tokens_[input_pos_].tag) == "N" ||
-                          pos_to_str(tokens_[input_pos_].tag) == "ADV")) {
-            return false; // Shift to allow a longer VP rule to trigger (like V NP or V NP PP or V ADV)
+                          pos_to_str(tokens_[input_pos_].tag) == "ADV" ||
+                          pos_to_str(tokens_[input_pos_].tag) == "V" ||
+                          pos_to_str(tokens_[input_pos_].tag) == "AUX")) {
+            return false; // Shift to allow a longer VP rule to trigger (like V NP or V NP PP or V ADV) or S rule
+        }
+    }
+
+    if (stack_top_matches({"INTJ"}) || stack_top_matches({"INTJ", "NP"})) {
+        if (!at_end()) {
+            return false; // Shift to allow INTJ S or INTJ NP ADV
         }
     }
     
@@ -2153,6 +6368,28 @@ bool BottomUpParser::reduce_VP() {
         stack_.push_back({std::move(node), "VP"});
         return true;
     }
+    if (stack_top_matches({"AUX", "NP"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "VP";
+        node->type = NodeType::NON_TERMINAL;
+        auto np = std::move(stack_.back().node); stack_.pop_back();
+        auto aux = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(aux));
+        node->add_child(std::move(np));
+        stack_.push_back({std::move(node), "VP"});
+        return true;
+    }
+    if (stack_top_matches({"AUX", "ADJ"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "VP";
+        node->type = NodeType::NON_TERMINAL;
+        auto adj = std::move(stack_.back().node); stack_.pop_back();
+        auto aux = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(aux));
+        node->add_child(std::move(adj));
+        stack_.push_back({std::move(node), "VP"});
+        return true;
+    }
     if (stack_top_matches({"V", "NP", "PP"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "VP";
@@ -2212,6 +6449,21 @@ bool BottomUpParser::reduce_VP() {
 }
 
 bool BottomUpParser::reduce_S() {
+    if (stack_top_matches({"NP", "AUX", "NP", "VP"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "S";
+        node->type = NodeType::NON_TERMINAL;
+        auto vp = std::move(stack_.back().node); stack_.pop_back();
+        auto np2 = std::move(stack_.back().node); stack_.pop_back();
+        auto aux = std::move(stack_.back().node); stack_.pop_back();
+        auto np1 = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(np1));
+        node->add_child(std::move(aux));
+        node->add_child(std::move(np2));
+        node->add_child(std::move(vp));
+        stack_.push_back({std::move(node), "S"});
+        return true;
+    }
     if (stack_top_matches({"NP", "VP", "PP"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "S";
@@ -2225,6 +6477,32 @@ bool BottomUpParser::reduce_S() {
         stack_.push_back({std::move(node), "S"});
         return true;
     }
+    if (stack_top_matches({"AUX", "NP", "VP"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "S";
+        node->type = NodeType::NON_TERMINAL;
+        auto vp = std::move(stack_.back().node); stack_.pop_back();
+        auto np = std::move(stack_.back().node); stack_.pop_back();
+        auto aux = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(aux));
+        node->add_child(std::move(np));
+        node->add_child(std::move(vp));
+        stack_.push_back({std::move(node), "S"});
+        return true;
+    }
+    if (stack_top_matches({"AUX", "NP", "VP"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "S";
+        node->type = NodeType::NON_TERMINAL;
+        auto vp = std::move(stack_.back().node); stack_.pop_back();
+        auto np = std::move(stack_.back().node); stack_.pop_back();
+        auto aux = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(aux));
+        node->add_child(std::move(np));
+        node->add_child(std::move(vp));
+        stack_.push_back({std::move(node), "S"});
+        return true;
+    }
     if (stack_top_matches({"NP", "VP"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "S";
@@ -2233,6 +6511,59 @@ bool BottomUpParser::reduce_S() {
         auto np = std::move(stack_.back().node); stack_.pop_back();
         node->add_child(std::move(np));
         node->add_child(std::move(vp));
+        stack_.push_back({std::move(node), "S"});
+        return true;
+    }
+    if (stack_top_matches({"VP"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "S";
+        node->type = NodeType::NON_TERMINAL;
+        auto vp = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(vp));
+        stack_.push_back({std::move(node), "S"});
+        return true;
+    }
+    if (stack_top_matches({"INTJ", "S"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "S";
+        node->type = NodeType::NON_TERMINAL;
+        auto s = std::move(stack_.back().node); stack_.pop_back();
+        auto intj = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(intj));
+        node->add_child(std::move(s));
+        stack_.push_back({std::move(node), "S"});
+        return true;
+    }
+    if (stack_top_matches({"INTJ", "NP", "ADV"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "S";
+        node->type = NodeType::NON_TERMINAL;
+        auto adv = std::move(stack_.back().node); stack_.pop_back();
+        auto np = std::move(stack_.back().node); stack_.pop_back();
+        auto intj = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(intj));
+        node->add_child(std::move(np));
+        node->add_child(std::move(adv));
+        stack_.push_back({std::move(node), "S"});
+        return true;
+    }
+    if (stack_top_matches({"INTJ", "NP"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "S";
+        node->type = NodeType::NON_TERMINAL;
+        auto np = std::move(stack_.back().node); stack_.pop_back();
+        auto intj = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(intj));
+        node->add_child(std::move(np));
+        stack_.push_back({std::move(node), "S"});
+        return true;
+    }
+    if (stack_top_matches({"INTJ"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "S";
+        node->type = NodeType::NON_TERMINAL;
+        auto intj = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(intj));
         stack_.push_back({std::move(node), "S"});
         return true;
     }
@@ -2521,7 +6852,7 @@ POS Lexer::assign_pos(const std::string& word, bool is_first_word) {
     if (lower_word.size() > 3 && lower_word.substr(lower_word.size() - 3) == "ing") {
         return POS::V;
     }
-    if (lower_word.size() > 2 && lower_word.substr(lower_word.size() - 2) == "ly") {
+    if (lower_word.size() >= 4 && lower_word.substr(lower_word.size() - 2) == "ly") {
         return POS::ADV;
     }
     if (lower_word.size() > 2 && lower_word.substr(lower_word.size() - 2) == "ed") {
@@ -2537,7 +6868,7 @@ POS Lexer::assign_pos(const std::string& word, bool is_first_word) {
         return POS::PROPER_N;
     }
 
-    return POS::UNKNOWN;
+    return POS::N;
 }
 
 std::vector<Token> Lexer::tokenize() {
@@ -2562,10 +6893,13 @@ std::vector<Token> Lexer::tokenize() {
 #include "top_down_parser.h"
 #include "bottom_up_parser.h"
 #include "display.h"
+#include "pos_dict.h"
 #include <iostream>
 #include <string>
 
 int main(int argc, char* argv[]) {
+    load_dictionary("data/dictionary.txt");
+
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " [--bottom-up] [--dot filename] \"sentence to parse\"" << std::endl;
         return 1;
@@ -2654,79 +6988,99 @@ void ParseNode::add_child(std::unique_ptr<ParseNode> child) {
 ```cpp
 #include "pos_dict.h"
 #include <unordered_map>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <algorithm>
 
-static const std::unordered_map<std::string, POS> DICTIONARY = {
-    // 10 determiners
-    {"the", POS::DET}, {"a", POS::DET}, {"an", POS::DET}, {"this", POS::DET}, {"that", POS::DET},
-    {"these", POS::DET}, {"those", POS::DET}, {"my", POS::DET}, {"your", POS::DET}, {"his", POS::DET},
-    
-    // 20 nouns
-    {"dog", POS::N}, {"cat", POS::N}, {"fox", POS::N}, {"man", POS::N}, {"city", POS::N},
-    {"fence", POS::N}, {"tree", POS::N}, {"car", POS::N}, {"house", POS::N}, {"book", POS::N},
-    {"water", POS::N}, {"time", POS::N}, {"way", POS::N}, {"day", POS::N}, {"world", POS::N},
-    {"life", POS::N}, {"hand", POS::N}, {"part", POS::N}, {"child", POS::N}, {"eye", POS::N},
-    
-    // 20 verbs
-    {"runs", POS::V}, {"jumps", POS::V}, {"eats", POS::V}, {"sees", POS::V}, {"goes", POS::V},
-    {"walks", POS::V}, {"talks", POS::V}, {"sleeps", POS::V}, {"makes", POS::V}, {"knows", POS::V},
-    {"thinks", POS::V}, {"takes", POS::V}, {"comes", POS::V}, {"wants", POS::V}, {"looks", POS::V},
-    {"uses", POS::V}, {"finds", POS::V}, {"gives", POS::V}, {"tells", POS::V}, {"works", POS::V},
-    
-    // 10 adjectives
-    {"quick", POS::ADJ}, {"brown", POS::ADJ}, {"lazy", POS::ADJ}, {"tall", POS::ADJ}, {"happy", POS::ADJ},
-    {"good", POS::ADJ}, {"new", POS::ADJ}, {"first", POS::ADJ}, {"last", POS::ADJ}, {"long", POS::ADJ},
-    
-    // 10 adverbs
-    {"quickly", POS::ADV}, {"slowly", POS::ADV}, {"very", POS::ADV}, {"soon", POS::ADV}, {"now", POS::ADV},
-    {"always", POS::ADV}, {"never", POS::ADV}, {"often", POS::ADV}, {"well", POS::ADV}, {"hard", POS::ADV},
-    
-    // 10 prepositions
-    {"over", POS::PREP}, {"under", POS::PREP}, {"in", POS::PREP}, {"on", POS::PREP}, {"at", POS::PREP},
-    {"by", POS::PREP}, {"to", POS::PREP}, {"with", POS::PREP}, {"from", POS::PREP}, {"into", POS::PREP},
-    
-    // Pronouns
-    {"he", POS::PRON},     {"she", POS::PRON}, {"it", POS::PRON}, {"they", POS::PRON}, {"i", POS::PRON}, 
-    {"you", POS::PRON}, {"we", POS::PRON}, {"him", POS::PRON}, {"her", POS::PRON}, {"them", POS::PRON},
-    
-    // Auxiliaries
-    {"has", POS::AUX}, {"have", POS::AUX}, {"had", POS::AUX}, {"can", POS::AUX}, {"could", POS::AUX},
-    {"will", POS::AUX}, {"would", POS::AUX}, {"should", POS::AUX}, {"do", POS::AUX}, {"does", POS::AUX},
-    {"is", POS::AUX}, {"are", POS::AUX}, {"was", POS::AUX}, {"were", POS::AUX}, {"am", POS::AUX},
-    {"loves", POS::V}, {"running", POS::V}, {"sleeps", POS::V},
-    
-    // Numbers
-    {"one", POS::NUM}, {"two", POS::NUM}, {"three", POS::NUM}, {"four", POS::NUM}, {"five", POS::NUM}
-};
+// Runtime dictionary — populated by load_dictionary()
+static std::unordered_map<std::string, POS> DICTIONARY;
 
 std::string pos_to_str(POS tag) {
     switch(tag) {
-        case POS::DET: return "DET";
-        case POS::N: return "N";
-        case POS::V: return "V";
-        case POS::ADJ: return "ADJ";
-        case POS::ADV: return "ADV";
-        case POS::PREP: return "PREP";
-        case POS::PRON: return "PRON";
-        case POS::CONJ: return "CONJ";
-        case POS::AUX: return "AUX";
-        case POS::NUM: return "NUM";
-        case POS::PROPER_N: return "PROPER_N";
-        case POS::OP: return "OP";
-        case POS::LPAREN: return "LPAREN";
-        case POS::RPAREN: return "RPAREN";
+        case POS::DET:     return "DET";
+        case POS::N:       return "N";
+        case POS::V:       return "V";
+        case POS::ADJ:     return "ADJ";
+        case POS::ADV:     return "ADV";
+        case POS::PREP:    return "PREP";
+        case POS::PRON:    return "PRON";
+        case POS::CONJ:    return "CONJ";
+        case POS::AUX:     return "AUX";
+        case POS::NUM:     return "NUM";
+        case POS::PROPER_N:return "PROPER_N";
+        case POS::OP:      return "OP";
+        case POS::LPAREN:  return "LPAREN";
+        case POS::RPAREN:  return "RPAREN";
+        case POS::INTJ:    return "INTJ";
         case POS::UNKNOWN: return "UNKNOWN";
-        default: return "UNKNOWN";
+        default:           return "UNKNOWN";
     }
+}
+
+POS str_to_pos(const std::string& s) {
+    if (s == "DET")      return POS::DET;
+    if (s == "N")        return POS::N;
+    if (s == "V")        return POS::V;
+    if (s == "ADJ")      return POS::ADJ;
+    if (s == "ADV")      return POS::ADV;
+    if (s == "PREP")     return POS::PREP;
+    if (s == "PRON")     return POS::PRON;
+    if (s == "CONJ")     return POS::CONJ;
+    if (s == "AUX")      return POS::AUX;
+    if (s == "NUM")      return POS::NUM;
+    if (s == "PROPER_N") return POS::PROPER_N;
+    if (s == "INTJ")     return POS::INTJ;
+    return POS::UNKNOWN;
+}
+
+void load_dictionary(const std::string& filename) {
+    // Seed with minimal fallback so parser works even without the file
+    DICTIONARY = {
+        {"the",POS::DET},{"a",POS::DET},{"an",POS::DET},
+        {"is",POS::AUX},{"are",POS::AUX},{"was",POS::AUX},
+        {"he",POS::PRON},{"she",POS::PRON},{"it",POS::PRON},
+        {"they",POS::PRON},{"i",POS::PRON},{"you",POS::PRON},
+        {"we",POS::PRON},{"him",POS::PRON},{"her",POS::DET},
+        {"and",POS::CONJ},{"but",POS::CONJ},{"or",POS::CONJ},
+        {"in",POS::PREP},{"on",POS::PREP},{"at",POS::PREP},
+        {"to",POS::PREP},{"over",POS::PREP},{"with",POS::PREP},
+    };
+
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Warning: dictionary file '" << filename
+                  << "' not found. Parser will use suffix heuristics only.\n";
+        return;
+    }
+
+    std::string line;
+    int loaded = 0;
+    while (std::getline(file, line)) {
+        // Strip comments (# to end of line)
+        auto hash = line.find('#');
+        if (hash != std::string::npos) line = line.substr(0, hash);
+
+        std::istringstream iss(line);
+        std::string word, tag_str;
+        if (!(iss >> word >> tag_str)) continue;
+
+        POS tag = str_to_pos(tag_str);
+        if (tag == POS::UNKNOWN) continue;
+
+        // Lowercase all keys — lookup is always case-insensitive
+        std::transform(word.begin(), word.end(), word.begin(),
+            [](unsigned char c){ return std::tolower(c); });
+        DICTIONARY[word] = tag;
+        loaded++;
+    }
+    std::cerr << "Loaded " << loaded << " dictionary entries from " << filename << "\n";
 }
 
 POS lookup_word(const std::string& word) {
     auto it = DICTIONARY.find(word);
-    if (it != DICTIONARY.end()) {
-        return it->second;
-    }
-    return POS::UNKNOWN;
+    return (it != DICTIONARY.end()) ? it->second : POS::UNKNOWN;
 }
-
 ```
 
 ## File: `src/symbol_table.cpp`
@@ -2759,11 +7113,15 @@ void SymbolTable::traverse(const ParseNode* node, const std::string& parent_labe
         } else if (parent_label == "VP") {
             if (node->label == "V") role = "VP.head";
             else if (node->label == "AUX") role = "VP.auxiliary";
-            else if (node->label == "ADV") role = "VP.modifier";
+            else if (node->label == "ADV" || node->label == "ADJ") role = "VP.modifier";
             else role = parent_label + "." + node->label;
         } else if (parent_label == "PP") {
             if (node->label == "PREP") role = "PP.head";
             else role = parent_label + "." + node->label;
+        } else if (parent_label == "S" && node->label == "INTJ") {
+            role = "S.interjection";
+        } else if (parent_label == "S" && node->label == "AUX") {
+            role = "S.auxiliary";
         } else {
             role = parent_label + "." + node->label;
         }
@@ -2912,6 +7270,24 @@ bool TopDownParser::consume(POS expected, ParseNode* parent) {
 std::unique_ptr<ParseNode> TopDownParser::parse_S() {
     size_t saved_cursor = cursor_;
     
+    // S -> NP AUX NP VP
+    auto s_np_aux = std::make_unique<ParseNode>();
+    s_np_aux->label = "S";
+    s_np_aux->type = NodeType::NON_TERMINAL;
+    if (auto np1 = parse_NP()) {
+        s_np_aux->add_child(std::move(np1));
+        if (consume(POS::AUX, s_np_aux.get())) {
+            if (auto np2 = parse_NP()) {
+                s_np_aux->add_child(std::move(np2));
+                if (auto vp = parse_VP()) {
+                    s_np_aux->add_child(std::move(vp));
+                    return s_np_aux;
+                }
+            }
+        }
+    }
+    cursor_ = saved_cursor;
+
     // S -> NP VP PP
     auto s1 = std::make_unique<ParseNode>();
     s1->label = "S";
@@ -2938,6 +7314,78 @@ std::unique_ptr<ParseNode> TopDownParser::parse_S() {
             s2->add_child(std::move(vp));
             return s2;
         }
+    }
+    cursor_ = saved_cursor;
+
+    // S -> AUX NP VP
+    auto s_aux = std::make_unique<ParseNode>();
+    s_aux->label = "S";
+    s_aux->type = NodeType::NON_TERMINAL;
+    if (consume(POS::AUX, s_aux.get())) {
+        if (auto np = parse_NP()) {
+            s_aux->add_child(std::move(np));
+            if (auto vp = parse_VP()) {
+                s_aux->add_child(std::move(vp));
+                return s_aux;
+            }
+        }
+    }
+    cursor_ = saved_cursor;
+
+    // S -> VP
+    auto s_vp = std::make_unique<ParseNode>();
+    s_vp->label = "S";
+    s_vp->type = NodeType::NON_TERMINAL;
+    if (auto vp = parse_VP()) {
+        s_vp->add_child(std::move(vp));
+        return s_vp;
+    }
+    cursor_ = saved_cursor;
+
+    // S -> INTJ S
+    auto s_intj_s = std::make_unique<ParseNode>();
+    s_intj_s->label = "S";
+    s_intj_s->type = NodeType::NON_TERMINAL;
+    if (consume(POS::INTJ, s_intj_s.get())) {
+        if (auto s = parse_S()) {
+            s_intj_s->add_child(std::move(s));
+            return s_intj_s;
+        }
+    }
+    cursor_ = saved_cursor;
+
+    // S -> INTJ NP ADV
+    auto s_intj_np_adv = std::make_unique<ParseNode>();
+    s_intj_np_adv->label = "S";
+    s_intj_np_adv->type = NodeType::NON_TERMINAL;
+    if (consume(POS::INTJ, s_intj_np_adv.get())) {
+        if (auto np = parse_NP()) {
+            s_intj_np_adv->add_child(std::move(np));
+            if (consume(POS::ADV, s_intj_np_adv.get())) {
+                return s_intj_np_adv;
+            }
+        }
+    }
+    cursor_ = saved_cursor;
+
+    // S -> INTJ NP
+    auto s3 = std::make_unique<ParseNode>();
+    s3->label = "S";
+    s3->type = NodeType::NON_TERMINAL;
+    if (consume(POS::INTJ, s3.get())) {
+        if (auto np = parse_NP()) {
+            s3->add_child(std::move(np));
+            return s3;
+        }
+    }
+    cursor_ = saved_cursor;
+
+    // S -> INTJ
+    auto s4 = std::make_unique<ParseNode>();
+    s4->label = "S";
+    s4->type = NodeType::NON_TERMINAL;
+    if (consume(POS::INTJ, s4.get())) {
+        return s4;
     }
     cursor_ = saved_cursor;
     
@@ -3031,6 +7479,27 @@ std::unique_ptr<ParseNode> TopDownParser::parse_VP() {
     vp_aux2->type = NodeType::NON_TERMINAL;
     if (consume(POS::AUX, vp_aux2.get()) && consume(POS::V, vp_aux2.get())) {
         return vp_aux2;
+    }
+    cursor_ = saved_cursor;
+
+    // VP -> AUX NP
+    auto vp_aux_np = std::make_unique<ParseNode>();
+    vp_aux_np->label = "VP";
+    vp_aux_np->type = NodeType::NON_TERMINAL;
+    if (consume(POS::AUX, vp_aux_np.get())) {
+        if (auto np = parse_NP()) {
+            vp_aux_np->add_child(std::move(np));
+            return vp_aux_np;
+        }
+    }
+    cursor_ = saved_cursor;
+
+    // VP -> AUX ADJ
+    auto vp_aux_adj = std::make_unique<ParseNode>();
+    vp_aux_adj->label = "VP";
+    vp_aux_adj->type = NodeType::NON_TERMINAL;
+    if (consume(POS::AUX, vp_aux_adj.get()) && consume(POS::ADJ, vp_aux_adj.get())) {
+        return vp_aux_adj;
     }
     cursor_ = saved_cursor;
 
@@ -3641,9 +8110,9 @@ Math expressions are evaluated using the Top-Down parser. Note that the symbol t
 ## Supported Grammar
 
 ### English Sentences
-- S -> NP VP | NP VP PP
+- S -> NP VP | NP VP PP | INTJ S | INTJ NP ADV | INTJ NP | INTJ | NP AUX NP VP | AUX NP VP | VP
 - NP -> DET ADJ ADJ N | DET ADJ N | DET N | PRON | PROPER_N | N
-- VP -> AUX V NP | AUX V | V NP PP | V NP | V PP | V ADV | V
+- VP -> AUX V NP | AUX V | V NP PP | V NP | V PP | V ADV | V | AUX NP | AUX ADJ
 - PP -> PREP NP
 
 ### Arithmetic Expressions
@@ -3657,5 +8126,188 @@ Math expressions are evaluated using the Top-Down parser. Note that the symbol t
 - `src/`: Implementation files for the Lexer, Parsers, AST Nodes, and Display utilities.
 - `scripts/`: Execution scripts like `run_smoke_tests`.
 - `tests/`: Unit tests and fixture files for verifying parser integrity.
+
+```
+
+## File: `justfile`
+
+```text
+# https://just.systems
+
+default:
+    echo 'Hello, world!'
+
+build:
+    echo 'Building the project...'
+    g++ -std=c++17 src/*.cpp -Iinclude -o english-parser
+
+```
+
+## File: `patch_debug`
+
+```text
+--- src/bottom_up_parser.cpp
++++ src/bottom_up_parser.cpp
+@@ -19,6 +19,10 @@
+     while (loop_counter++ < max_loops) {
++        std::cout << "Stack: ";
++        for (const auto& item : stack_) std::cout << item.symbol << " ";
++        std::cout << " | Next: " << (at_end() ? "EOF" : pos_to_str(tokens_[input_pos_].tag)) << "\n";
+         if (stack_.size() == 1 && stack_.back().symbol == "S" && at_end()) {
+             return std::move(stack_.back().node);
+         }
+
+```
+
+## File: `update_bottom_up.patch`
+
+```diff
+--- src/bottom_up_parser.cpp
++++ src/bottom_up_parser.cpp
+@@ -279,6 +279,25 @@
+         stack_.push_back({std::move(node), "S"});
+         return true;
+     }
++    if (stack_top_matches({"INTJ", "NP"})) {
++        auto node = std::make_unique<ParseNode>();
++        node->label = "S";
++        node->type = NodeType::NON_TERMINAL;
++        auto np = std::move(stack_.back().node); stack_.pop_back();
++        auto intj = std::move(stack_.back().node); stack_.pop_back();
++        node->add_child(std::move(intj));
++        node->add_child(std::move(np));
++        stack_.push_back({std::move(node), "S"});
++        return true;
++    }
++    if (stack_top_matches({"INTJ"})) {
++        auto node = std::make_unique<ParseNode>();
++        node->label = "S";
++        node->type = NodeType::NON_TERMINAL;
++        auto intj = std::move(stack_.back().node); stack_.pop_back();
++        node->add_child(std::move(intj));
++        stack_.push_back({std::move(node), "S"});
++        return true;
++    }
+     return false;
+ }
+
+```
+
+## File: `update_top_down.patch`
+
+```diff
+--- src/top_down_parser.cpp
++++ src/top_down_parser.cpp
+@@ -67,6 +67,23 @@
+ std::unique_ptr<ParseNode> TopDownParser::parse_S() {
+     size_t saved_cursor = cursor_;
+     
++    // S -> NP AUX NP VP
++    auto s_np_aux = std::make_unique<ParseNode>();
++    s_np_aux->label = "S";
++    s_np_aux->type = NodeType::NON_TERMINAL;
++    if (auto np1 = parse_NP()) {
++        s_np_aux->add_child(std::move(np1));
++        if (consume(POS::AUX, s_np_aux.get())) {
++            if (auto np2 = parse_NP()) {
++                s_np_aux->add_child(std::move(np2));
++                if (auto vp = parse_VP()) {
++                    s_np_aux->add_child(std::move(vp));
++                    return s_np_aux;
++                }
++            }
++        }
++    }
++    cursor_ = saved_cursor;
++
+     // S -> NP VP PP
+     auto s1 = std::make_unique<ParseNode>();
+     s1->label = "S";
+@@ -95,6 +112,39 @@
+     }
+     cursor_ = saved_cursor;
+ 
++    // S -> AUX NP VP
++    auto s_aux = std::make_unique<ParseNode>();
++    s_aux->label = "S";
++    s_aux->type = NodeType::NON_TERMINAL;
++    if (consume(POS::AUX, s_aux.get())) {
++        if (auto np = parse_NP()) {
++            s_aux->add_child(std::move(np));
++            if (auto vp = parse_VP()) {
++                s_aux->add_child(std::move(vp));
++                return s_aux;
++            }
++        }
++    }
++    cursor_ = saved_cursor;
++
++    // S -> VP
++    auto s_vp = std::make_unique<ParseNode>();
++    s_vp->label = "S";
++    s_vp->type = NodeType::NON_TERMINAL;
++    if (auto vp = parse_VP()) {
++        s_vp->add_child(std::move(vp));
++        return s_vp;
++    }
++    cursor_ = saved_cursor;
++
++    // S -> INTJ S
++    auto s_intj_s = std::make_unique<ParseNode>();
++    s_intj_s->label = "S";
++    s_intj_s->type = NodeType::NON_TERMINAL;
++    if (consume(POS::INTJ, s_intj_s.get())) {
++        if (auto s = parse_S()) {
++            s_intj_s->add_child(std::move(s));
++            return s_intj_s;
++        }
++    }
++    cursor_ = saved_cursor;
++
++    // S -> INTJ NP ADV
++    auto s_intj_np_adv = std::make_unique<ParseNode>();
++    s_intj_np_adv->label = "S";
++    s_intj_np_adv->type = NodeType::NON_TERMINAL;
++    if (consume(POS::INTJ, s_intj_np_adv.get())) {
++        if (auto np = parse_NP()) {
++            s_intj_np_adv->add_child(std::move(np));
++            if (consume(POS::ADV, s_intj_np_adv.get())) {
++                return s_intj_np_adv;
++            }
++        }
++    }
++    cursor_ = saved_cursor;
++
+     // S -> INTJ NP
+     auto s3 = std::make_unique<ParseNode>();
+     s3->label = "S";
+@@ -210,6 +260,25 @@
+     }
+     cursor_ = saved_cursor;
+ 
++    // VP -> AUX NP
++    auto vp_aux_np = std::make_unique<ParseNode>();
++    vp_aux_np->label = "VP";
++    vp_aux_np->type = NodeType::NON_TERMINAL;
++    if (consume(POS::AUX, vp_aux_np.get())) {
++        if (auto np = parse_NP()) {
++            vp_aux_np->add_child(std::move(np));
++            return vp_aux_np;
++        }
++    }
++    cursor_ = saved_cursor;
++
++    // VP -> AUX ADJ
++    auto vp_aux_adj = std::make_unique<ParseNode>();
++    vp_aux_adj->label = "VP";
++    vp_aux_adj->type = NodeType::NON_TERMINAL;
++    if (consume(POS::AUX, vp_aux_adj.get()) && consume(POS::ADJ, vp_aux_adj.get())) {
++        return vp_aux_adj;
++    }
++    cursor_ = saved_cursor;
++
+     // VP -> V NP PP
+     auto vp1 = std::make_unique<ParseNode>();
+     vp1->label = "VP";
 
 ```
