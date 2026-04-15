@@ -20,6 +20,7 @@ void SymbolTable::traverse(const ParseNode* node, const std::string& parent_labe
         if (parent_label == "NP" || parent_label == "NP_participle") {
             if (node->label == "DET") role = "NP.determiner";
             else if (node->label == "NUM") role = "NP.quantity";
+            else if (node->label == "PRON" && (node->lexeme == "who" || node->lexeme == "that" || node->lexeme == "which")) role = "NP.relative_pronoun";
             else if (node->label == "N" || node->label == "PRON" || node->label == "PROPER_N") role = "NP.head";
             else if (node->label == "V") {
                 if (parent_label == "NP_participle") role = "NP.participle_modifier";

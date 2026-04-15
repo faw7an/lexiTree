@@ -66,6 +66,8 @@ POS Lexer::assign_pos(const std::string& word, bool is_first_word) {
     std::transform(lower_word.begin(), lower_word.end(), lower_word.begin(),
                    [](unsigned char c){ return std::tolower(c); });
                    
+    if (lower_word == "that") return POS::PRON;
+
     POS tag = lookup_word(lower_word);
     if (tag != POS::UNKNOWN) {
         return tag;

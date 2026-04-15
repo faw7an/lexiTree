@@ -70,9 +70,9 @@ bool TopDownParser::consume(POS expected, ParseNode* parent) {
     bool match = (actual == expected);
     
     // Fallback for V/N ambiguity
+    // DISABLE fallback for N as V to prevent V from being stolen by NP
     if (!match) {
-        if (expected == POS::N && actual == POS::V) match = true;
-        else if (expected == POS::V && actual == POS::N) match = true;
+        if (expected == POS::V && actual == POS::N) match = true;
     }
 
     if (getenv("PARSER_DEBUG")) {
@@ -108,7 +108,14 @@ std::unique_ptr<ParseNode> TopDownParser::parse_S() {
                 s_node = std::move(s2);
             }
         }
-        if (s_node) goto post_process;
+        if (s_node) {
+            // Check if we consumed all tokens. If not, maybe it's S -> S S or something else.
+            if (at_end()) goto post_process;
+            else {
+                cursor_ = saved_cursor;
+                s_node = nullptr;
+            }
+        }
         cursor_ = saved_cursor;
     }
 
@@ -150,11 +157,18 @@ std::unique_ptr<ParseNode> TopDownParser::parse_S() {
         auto s_s_conj_s = std::make_unique<ParseNode>();
         s_s_conj_s->label = "S"; s_s_conj_s->type = NodeType::NON_TERMINAL;
         if (auto s1 = parse_S_base()) {
-            if (consume(POS::CONJ, s_s_conj_s.get())) {
+            size_t before_conj = cursor_;
+            if (current().tag == POS::CONJ) {
+                auto conj = std::make_unique<ParseNode>();
+                conj->label = "CONJ"; conj->lexeme = current().word; conj->type = NodeType::TERMINAL;
+                cursor_++;
                 if (auto s2 = parse_S()) {
                      s_s_conj_s->add_child(std::move(s1));
+                     s_s_conj_s->add_child(std::move(conj));
                      s_s_conj_s->add_child(std::move(s2));
                      s_node = std::move(s_s_conj_s);
+                } else {
+                     cursor_ = before_conj;
                 }
             }
         }
@@ -444,6 +458,10 @@ std::unique_ptr<ParseNode> TopDownParser::parse_NP() {
     if (consume(POS::DET, n.get()) && consume(POS::V, n.get()) && consume(POS::N, n.get()) && consume(POS::N, n.get())) goto check_extra;
     cursor_ = saved_cursor; n = std::make_unique<ParseNode>(); n->label = "NP"; n->type = NodeType::NON_TERMINAL;
 
+    // DET V N
+    if (consume(POS::DET, n.get()) && consume(POS::V, n.get()) && consume(POS::N, n.get())) goto check_extra;
+    cursor_ = saved_cursor; n = std::make_unique<ParseNode>(); n->label = "NP"; n->type = NodeType::NON_TERMINAL;
+
     // DET ADJ N
     if (consume(POS::DET, n.get()) && consume(POS::ADJ, n.get()) && consume(POS::N, n.get())) goto check_extra;
     cursor_ = saved_cursor; n = std::make_unique<ParseNode>(); n->label = "NP"; n->type = NodeType::NON_TERMINAL;
@@ -487,6 +505,10 @@ std::unique_ptr<ParseNode> TopDownParser::parse_NP() {
 
     // N
     if (consume(POS::N, n.get())) goto check_extra;
+    cursor_ = saved_cursor; n = std::make_unique<ParseNode>(); n->label = "NP"; n->type = NodeType::NON_TERMINAL;
+
+    // V (Gerund acting as NP)
+    if (consume(POS::V, n.get())) goto check_extra;
     
     return nullptr;
 
@@ -502,11 +524,24 @@ check_extra:
             auto rel_pron = std::make_unique<ParseNode>();
             rel_pron->label = "PRON"; rel_pron->lexeme = current().word; rel_pron->type = NodeType::TERMINAL;
             cursor_++;
+            
+            // Try NP -> NP PRON S (e.g., "the cheese that the mouse stole")
             if (auto s = parse_S()) {
                 auto wrap = std::make_unique<ParseNode>(); wrap->label = "NP"; wrap->type = NodeType::NON_TERMINAL;
                 wrap->add_child(std::move(n)); wrap->add_child(std::move(rel_pron)); wrap->add_child(std::move(s));
                 n = std::move(wrap);
-            } else { cursor_ = cp; matched = false; }
+            } else {
+                cursor_ = cp + 1; // rewind to just after PRON
+                // Try NP -> NP PRON VP (e.g., "the cat that chased the mouse")
+                if (auto vp = parse_VP()) {
+                    auto wrap = std::make_unique<ParseNode>(); wrap->label = "NP"; wrap->type = NodeType::NON_TERMINAL;
+                    wrap->add_child(std::move(n)); wrap->add_child(std::move(rel_pron)); wrap->add_child(std::move(vp));
+                    n = std::move(wrap);
+                } else {
+                    cursor_ = cp; 
+                    matched = false;
+                }
+            }
         } else if (current().tag == POS::CONJ && (current().word == "and" || current().word == "or")) {
             // NP list/conjunction: NP -> NP CONJ NP
             auto conj = std::make_unique<ParseNode>();
