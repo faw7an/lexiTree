@@ -1,0 +1,73 @@
+========================================
+ Parsing Strategy: Top-Down (Recursive Descent)
+========================================
+
+                         S             
+               ┌─────────┴─────────┐   
+             NP                   VP   
+  ┌───────┬───┴────┬───────┐       │   
+ DET     ADJ      ADJ      N       V   
+"The"  "quick"  "brown"  "fox"  "jumps"
+
+
+Symbol Table:
+┌-------┬--------┬---------┬---------------┬----------┐
+│ Index │ Lexeme │ POS Tag │ Grammar Role  │ Scope    │
+├-------┼--------┼---------┼---------------┼----------┤
+│ 1     │ The    │ DET     │ NP.determiner │ Sentence │
+│ 2     │ quick  │ ADJ     │ NP.modifier   │ Sentence │
+│ 3     │ brown  │ ADJ     │ NP.modifier   │ Sentence │
+│ 4     │ fox    │ N       │ NP.head       │ Sentence │
+│ 5     │ jumps  │ V       │ VP.head       │ Sentence │
+└-------┴--------┴---------┴---------------┴----------┘
+========================================
+ Parsing Strategy: Top-Down (Recursive Descent)
+========================================
+
+                             S                                              
+     ┌───────────────┬───────┴────────────────────────┐                     
+   CONJ            S                          S                             
+"Although"    ┌────┴────┐          ┌──────────┴──────────┐                  
+             NP        VP         NP               VP                       
+              │     ┌───┴───┐      │      ┌─────────┴─────────┐             
+            PRON   VP     ADV    PRON    ADV               VP               
+            "he"    │    "late"  "he"  "still"       ┌──────┴───────┐       
+                   AUX                              V            NP         
+                  "was"                         "attended"    ┌───┴────┐    
+                                                             DET       N    
+                                                            "the"  "meeting"
+
+
+Symbol Table:
+┌-------┬----------┬---------┬---------------┬----------┐
+│ Index │ Lexeme   │ POS Tag │ Grammar Role  │ Scope    │
+├-------┼----------┼---------┼---------------┼----------┤
+│ 1     │ Although │ CONJ    │ S.conjunction │ Sentence │
+│ 2     │ he       │ PRON    │ NP.head       │ Sentence │
+│ 3     │ was      │ AUX     │ VP.auxiliary  │ Sentence │
+│ 4     │ late     │ ADV     │ VP.modifier   │ Sentence │
+│ 5     │ he       │ PRON    │ NP.head       │ Sentence │
+│ 6     │ still    │ ADV     │ VP.modifier   │ Sentence │
+│ 7     │ attended │ V       │ VP.head       │ Sentence │
+│ 8     │ the      │ DET     │ NP.determiner │ Sentence │
+│ 9     │ meeting  │ N       │ NP.head       │ Sentence │
+└-------┴----------┴---------┴---------------┴----------┘
+========================================
+ Parsing Strategy: Top-Down (Recursive Descent)
+========================================
+
+                         EXPR                                                 
+   ┌─────┬──────┬──────┬───┴────────────────────────┐                         
+ TERM   OP    TERM    OP                  TERM                                
+   │    "-"     │     "+"     ┌──────┬──────┴──────────────┐                  
+FACTOR       FACTOR        FACTOR   OP                  FACTOR                
+   │            │             │     "*"     ┌──────────────┼───────────────┐  
+ NUM           NUM           NUM         LPAREN          EXPR           RPAREN
+ "10"          "2"           "5"          "("       ┌──────┼──────┐      ")"  
+                                                  TERM    OP    TERM          
+                                                    │     "+"     │           
+                                                 FACTOR        FACTOR         
+                                                    │             │           
+                                                   NUM           NUM          
+                                                   "3"           "4"          
+

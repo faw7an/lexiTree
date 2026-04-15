@@ -140,7 +140,7 @@ std::unique_ptr<ParseNode> TopDownParser::parse_S() {
         s_conj_s_s->type = NodeType::NON_TERMINAL;
         if (consume(POS::CONJ, s_conj_s_s.get())) {
             // S -> CONJ S S (Longest match: Although S S)
-            if (auto s1_child = parse_S()) {
+            if (auto s1_child = parse_S_base()) {
                 s_conj_s_s->add_child(std::move(s1_child));
                 if (auto s2_child = parse_S()) {
                     s_conj_s_s->add_child(std::move(s2_child));
