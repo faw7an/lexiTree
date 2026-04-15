@@ -14,6 +14,7 @@ private:
     size_t cursor_;
 
     std::unique_ptr<ParseNode> parse_S();
+    std::unique_ptr<ParseNode> parse_S_base();
     std::unique_ptr<ParseNode> parse_NP();
     std::unique_ptr<ParseNode> parse_VP();
     std::unique_ptr<ParseNode> parse_PP();

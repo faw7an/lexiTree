@@ -22,8 +22,6 @@ int main(int argc, char* argv[]) {
         std::string arg = argv[i];
         if (arg == "--bottom-up") {
             use_bottom_up = true;
-        } else if (arg == "--top-down") {
-            // Skip
         } else if (arg == "--dot" && i + 1 < argc) {
             dot_filename = argv[++i];
         } else {
@@ -52,34 +50,6 @@ int main(int argc, char* argv[]) {
 
     if (root) {
         Display::print_tree(root.get());
-        
-        if (!dot_filename.empty()) {
-            Display::export_dot(root.get(), dot_filename);
-        }
-        
-        bool is_expr = false;
-        for (const auto& token : tokens) {
-            if (token.tag == POS::OP) {
-                is_expr = true;
-                break;
-            }
-        }
-        if (!is_expr && tokens.size() > 0) {
-            is_expr = true;
-            for (const auto& token : tokens) {
-                if (token.tag != POS::NUM && token.tag != POS::OP && token.tag != POS::LPAREN && token.tag != POS::RPAREN) {
-                    is_expr = false;
-                    break;
-                }
-            }
-        }
-        
-        if (!is_expr) {
-            std::cout << "\nSymbol Table:\n";
-            SymbolTable table;
-            table.build(root.get());
-            Display::print_symbol_table(table);
-        }
     } else {
         std::cerr << "Error: Could not parse input as a valid sentence or expression." << std::endl;
         return 1;
