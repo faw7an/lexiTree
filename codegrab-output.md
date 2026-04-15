@@ -29,19 +29,8 @@ lexiTree/
 │   ├── pos_dict.cpp
 │   ├── symbol_table.cpp
 │   └── top_down_parser.cpp
-├── tests/
-│   ├── fixtures/
-│   │   └── sentences.txt
-│   ├── test_bottom_up.cpp
-│   ├── test_display.cpp
-│   ├── test_lexer.cpp
-│   ├── test_symbol_table.cpp
-│   └── test_top_down.cpp
 ├── README.md
-├── justfile
-├── patch_debug
-├── update_bottom_up.patch
-└── update_top_down.patch
+└── justfile
 ```
 
 # Project Files
@@ -3895,6 +3884,18 @@ for PREP
 tomorrow N
 rain V
 
+charger N
+hall N
+break N
+break V
+time N
+students N
+files N
+voters N
+elections N
+projects N
+
+
 ```
 
 ## File: `docs/AGENT.md`
@@ -6279,6 +6280,38 @@ bool BottomUpParser::reduce_PP() {
 }
 
 bool BottomUpParser::reduce_NP() {
+    if (stack_top_matches({"DET", "N", "N", "N"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "NP";
+        node->type = NodeType::NON_TERMINAL;
+        auto n3 = std::move(stack_.back().node); stack_.pop_back();
+        auto n2 = std::move(stack_.back().node); stack_.pop_back();
+        auto n1 = std::move(stack_.back().node); stack_.pop_back();
+        auto det = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(det));
+        node->add_child(std::move(n1));
+        node->add_child(std::move(n2));
+        node->add_child(std::move(n3));
+        stack_.push_back({std::move(node), "NP"});
+        return true;
+    }
+
+    if (stack_top_matches({"DET", "V", "N", "N"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "NP";
+        node->type = NodeType::NON_TERMINAL;
+        auto n2 = std::move(stack_.back().node); stack_.pop_back();
+        auto n1 = std::move(stack_.back().node); stack_.pop_back();
+        auto v = std::move(stack_.back().node); stack_.pop_back();
+        auto det = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(det));
+        node->add_child(std::move(v));
+        node->add_child(std::move(n1));
+        node->add_child(std::move(n2));
+        stack_.push_back({std::move(node), "NP"});
+        return true;
+    }
+
     if (stack_top_matches({"DET", "ADJ", "ADJ", "N"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "NP";
@@ -6294,6 +6327,34 @@ bool BottomUpParser::reduce_NP() {
         stack_.push_back({std::move(node), "NP"});
         return true;
     }
+    if (stack_top_matches({"DET", "NUM", "N"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "NP";
+        node->type = NodeType::NON_TERMINAL;
+        auto n = std::move(stack_.back().node); stack_.pop_back();
+        auto num = std::move(stack_.back().node); stack_.pop_back();
+        auto det = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(det));
+        node->add_child(std::move(num));
+        node->add_child(std::move(n));
+        stack_.push_back({std::move(node), "NP"});
+        return true;
+    }
+
+    if (stack_top_matches({"DET", "V", "N"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "NP";
+        node->type = NodeType::NON_TERMINAL;
+        auto n = std::move(stack_.back().node); stack_.pop_back();
+        auto v = std::move(stack_.back().node); stack_.pop_back();
+        auto det = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(det));
+        node->add_child(std::move(v));
+        node->add_child(std::move(n));
+        stack_.push_back({std::move(node), "NP"});
+        return true;
+    }
+
     if (stack_top_matches({"DET", "ADJ", "N"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "NP";
@@ -6321,6 +6382,33 @@ bool BottomUpParser::reduce_NP() {
         stack_.push_back({std::move(node), "NP"});
         return true;
     }
+    if (stack_top_matches({"NUM", "ADJ", "N"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "NP";
+        node->type = NodeType::NON_TERMINAL;
+        auto n = std::move(stack_.back().node); stack_.pop_back();
+        auto adj = std::move(stack_.back().node); stack_.pop_back();
+        auto num = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(num));
+        node->add_child(std::move(adj));
+        node->add_child(std::move(n));
+        stack_.push_back({std::move(node), "NP"});
+        return true;
+    }
+
+    if (stack_top_matches({"ADJ", "ADJ", "N"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "NP";
+        node->type = NodeType::NON_TERMINAL;
+        auto n = std::move(stack_.back().node); stack_.pop_back();
+        auto adj2 = std::move(stack_.back().node); stack_.pop_back();
+        auto adj1 = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(adj1));
+        node->add_child(std::move(adj2));
+        node->add_child(std::move(n));
+        stack_.push_back({std::move(node), "NP"});
+        return true;
+    }
     if (stack_top_matches({"DET", "N"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "NP";
@@ -6332,6 +6420,94 @@ bool BottomUpParser::reduce_NP() {
         stack_.push_back({std::move(node), "NP"});
         return true;
     }
+    if (stack_top_matches({"NUM", "N"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "NP";
+        node->type = NodeType::NON_TERMINAL;
+        auto n = std::move(stack_.back().node); stack_.pop_back();
+        auto num = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(num));
+        node->add_child(std::move(n));
+        stack_.push_back({std::move(node), "NP"});
+        return true;
+    }
+
+    if (stack_top_matches({"V", "N"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "NP";
+        node->type = NodeType::NON_TERMINAL;
+        auto n = std::move(stack_.back().node); stack_.pop_back();
+        auto v = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(v));
+        node->add_child(std::move(n));
+        stack_.push_back({std::move(node), "NP"});
+        return true;
+    }
+
+    if (stack_top_matches({"ADJ", "N"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "NP";
+        node->type = NodeType::NON_TERMINAL;
+        auto n = std::move(stack_.back().node); stack_.pop_back();
+        auto adj = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(adj));
+        node->add_child(std::move(n));
+        stack_.push_back({std::move(node), "NP"});
+        return true;
+    }
+    if (stack_top_matches({"ADJ", "V"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "NP";
+        node->type = NodeType::NON_TERMINAL;
+        auto v = std::move(stack_.back().node); stack_.pop_back();
+        auto adj = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(adj));
+        node->add_child(std::move(v));
+        stack_.push_back({std::move(node), "NP"});
+        return true;
+    }
+    if (stack_top_matches({"N", "N", "N"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "NP";
+        node->type = NodeType::NON_TERMINAL;
+        auto n3 = std::move(stack_.back().node); stack_.pop_back();
+        auto n2 = std::move(stack_.back().node); stack_.pop_back();
+        auto n1 = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(n1));
+        node->add_child(std::move(n2));
+        node->add_child(std::move(n3));
+        stack_.push_back({std::move(node), "NP"});
+        return true;
+    }
+    if (stack_top_matches({"N", "N"})) {
+        if (!at_end() && pos_to_str(tokens_[input_pos_].tag) == "N") return false;
+        auto node = std::make_unique<ParseNode>();
+        node->label = "NP";
+        node->type = NodeType::NON_TERMINAL;
+        auto n2 = std::move(stack_.back().node); stack_.pop_back();
+        auto n1 = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(n1));
+        node->add_child(std::move(n2));
+        stack_.push_back({std::move(node), "NP"});
+        return true;
+    }
+    if (stack_top_matches({"V"})) {
+        bool should_reduce_to_np = false;
+        if (stack_.size() > 1 && stack_[stack_.size() - 2].symbol == "PREP") should_reduce_to_np = true;
+        if (stack_.size() > 1 && stack_[stack_.size() - 2].symbol == "V") should_reduce_to_np = true;
+        if (!at_end() && (pos_to_str(tokens_[input_pos_].tag) == "AUX" || pos_to_str(tokens_[input_pos_].tag) == "V")) should_reduce_to_np = true;
+        
+        if (should_reduce_to_np) {
+            auto node = std::make_unique<ParseNode>();
+            node->label = "NP";
+            node->type = NodeType::NON_TERMINAL;
+            auto v = std::move(stack_.back().node); stack_.pop_back();
+            node->add_child(std::move(v));
+            stack_.push_back({std::move(node), "NP"});
+            return true;
+        }
+    }
+
     if (stack_top_matches({"PRON"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "NP";
@@ -6351,18 +6527,8 @@ bool BottomUpParser::reduce_NP() {
         return true;
     }
 
-    if (stack_top_matches({"N", "N"})) {
-        auto node = std::make_unique<ParseNode>();
-        node->label = "NP";
-        node->type = NodeType::NON_TERMINAL;
-        auto n2 = std::move(stack_.back().node); stack_.pop_back();
-        auto n1 = std::move(stack_.back().node); stack_.pop_back();
-        node->add_child(std::move(n1));
-        node->add_child(std::move(n2));
-        stack_.push_back({std::move(node), "NP"});
-        return true;
-    }
     if (stack_top_matches({"N"})) {
+        if (!at_end() && pos_to_str(tokens_[input_pos_].tag) == "N") return false;
         auto node = std::make_unique<ParseNode>();
         node->label = "NP";
         node->type = NodeType::NON_TERMINAL;
@@ -6374,7 +6540,19 @@ bool BottomUpParser::reduce_NP() {
     return false;
 }
 
+
 bool BottomUpParser::reduce_VP() {
+    if (stack_top_matches({"VP", "ADV"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "VP";
+        node->type = NodeType::NON_TERMINAL;
+        auto adv = std::move(stack_.back().node); stack_.pop_back();
+        auto vp = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(vp));
+        node->add_child(std::move(adv));
+        stack_.push_back({std::move(node), "VP"});
+        return true;
+    }
     if (stack_top_matches({"VP", "PP"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "VP";
@@ -6552,6 +6730,17 @@ bool BottomUpParser::reduce_VP() {
         stack_.push_back({std::move(node), "VP"});
         return true;
     }
+    if (stack_top_matches({"AUX", "PP"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "VP";
+        node->type = NodeType::NON_TERMINAL;
+        auto pp = std::move(stack_.back().node); stack_.pop_back();
+        auto aux = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(aux));
+        node->add_child(std::move(pp));
+        stack_.push_back({std::move(node), "VP"});
+        return true;
+    }
     if (stack_top_matches({"AUX", "ADJ"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "VP";
@@ -6646,6 +6835,17 @@ bool BottomUpParser::reduce_VP() {
 }
 
 bool BottomUpParser::reduce_S() {
+    if (stack_top_matches({"S", "ADV"})) {
+        auto node = std::make_unique<ParseNode>();
+        node->label = "S";
+        node->type = NodeType::NON_TERMINAL;
+        auto adv = std::move(stack_.back().node); stack_.pop_back();
+        auto s = std::move(stack_.back().node); stack_.pop_back();
+        node->add_child(std::move(s));
+        node->add_child(std::move(adv));
+        stack_.push_back({std::move(node), "S"});
+        return true;
+    }
     if (stack_top_matches({"S", "PP"})) {
         auto node = std::make_unique<ParseNode>();
         node->label = "S";
@@ -7076,7 +7276,7 @@ std::vector<std::string> Lexer::split_words(const std::string& s) {
                 current_word.clear();
             }
         } else if (c == '\'') {
-            continue; // Skip apostrophe to support contractions like "doesn't" -> "doesnt"
+            continue; // Strips apostrophe so "won't" becomes "wont"
         } else if (std::isdigit(c)) {
             if (!current_word.empty() && !std::isdigit(current_word[0])) {
                 words.push_back(current_word);
@@ -7217,9 +7417,18 @@ int main(int argc, char* argv[]) {
         
         bool is_expr = false;
         for (const auto& token : tokens) {
-            if (token.tag == POS::NUM || token.tag == POS::OP) {
+            if (token.tag == POS::OP) {
                 is_expr = true;
                 break;
+            }
+        }
+        if (!is_expr && tokens.size() > 0) {
+            is_expr = true;
+            for (const auto& token : tokens) {
+                if (token.tag != POS::NUM && token.tag != POS::OP && token.tag != POS::LPAREN && token.tag != POS::RPAREN) {
+                    is_expr = false;
+                    break;
+                }
             }
         }
         
@@ -7374,11 +7583,16 @@ void SymbolTable::traverse(const ParseNode* node, const std::string& parent_labe
     if (node->is_leaf()) {
         std::string role;
         
-        if (parent_label == "NP") {
+        if (parent_label == "NP" || parent_label == "NP_participle") {
             if (node->label == "DET") role = "NP.determiner";
+            else if (node->label == "NUM") role = "NP.quantity";
             else if (node->label == "N" || node->label == "PRON" || node->label == "PROPER_N") role = "NP.head";
+            else if (node->label == "V") {
+                if (parent_label == "NP_participle") role = "NP.participle_modifier";
+                else role = "NP.gerund";
+            }
             else if (node->label == "ADJ") role = "NP.modifier";
-            else role = parent_label + "." + node->label;
+            else role = "NP." + node->label;
         } else if (parent_label == "VP") {
             if (node->label == "V") role = "VP.head";
             else if (node->label == "AUX") role = "VP.auxiliary";
@@ -7404,8 +7618,15 @@ void SymbolTable::traverse(const ParseNode* node, const std::string& parent_labe
             next_scope = "Prepositional";
         }
         
-        for (const auto& child : node->children) {
-            traverse(child.get(), node->label, next_scope);
+        for (size_t i = 0; i < node->children.size(); ++i) {
+            auto& child = node->children[i];
+            std::string pass_label = node->label;
+            if (node->label == "NP" && child->label == "V") {
+                if (i + 1 < node->children.size() && node->children[i+1]->label == "N") {
+                    pass_label = "NP_participle";
+                }
+            }
+            traverse(child.get(), pass_label, next_scope);
         }
     }
 }
@@ -7482,9 +7703,18 @@ std::unique_ptr<ParseNode> TopDownParser::parse() {
 
     bool is_expr = false;
     for (const auto& token : tokens_) {
-        if (token.tag == POS::NUM || token.tag == POS::OP) {
+        if (token.tag == POS::OP) {
             is_expr = true;
             break;
+        }
+    }
+    if (!is_expr && tokens_.size() > 0) {
+        is_expr = true;
+        for (const auto& token : tokens_) {
+            if (token.tag != POS::NUM && token.tag != POS::OP && token.tag != POS::LPAREN && token.tag != POS::RPAREN) {
+                is_expr = false;
+                break;
+            }
         }
     }
 
@@ -7495,7 +7725,6 @@ std::unique_ptr<ParseNode> TopDownParser::parse() {
         root = parse_S();
     }
     
-    // To be a fully valid parse, we must have consumed all tokens.
     if (root && at_end()) {
         return root;
     }
@@ -7505,7 +7734,6 @@ std::unique_ptr<ParseNode> TopDownParser::parse() {
 
 const Token& TopDownParser::current() const {
     if (at_end()) {
-        // Return a dummy token representing EOF safely
         static const Token EOF_TOKEN{"", POS::UNKNOWN, -1};
         return EOF_TOKEN;
     }
@@ -7540,8 +7768,8 @@ bool TopDownParser::consume(POS expected, ParseNode* parent) {
 
 std::unique_ptr<ParseNode> TopDownParser::parse_S() {
     size_t saved_cursor = cursor_;
+    std::unique_ptr<ParseNode> s_node = nullptr;
     
-    // S -> CONJ S S (Handles: "Although you were late you did your homework")
     auto s_conj_s_s = std::make_unique<ParseNode>();
     s_conj_s_s->label = "S";
     s_conj_s_s->type = NodeType::NON_TERMINAL;
@@ -7550,384 +7778,334 @@ std::unique_ptr<ParseNode> TopDownParser::parse_S() {
             s_conj_s_s->add_child(std::move(s1_child));
             if (auto s2_child = parse_S()) {
                 s_conj_s_s->add_child(std::move(s2_child));
-                
-        while (auto pp = parse_PP()) {
-            auto new_s = std::make_unique<ParseNode>();
-            new_s->label = "S";
-            new_s->type = NodeType::NON_TERMINAL;
-            new_s->add_child(std::move(s_conj_s_s));
-            new_s->add_child(std::move(pp));
-            s_conj_s_s = std::move(new_s);
-        }
-        return s_conj_s_s;
-
+                s_node = std::move(s_conj_s_s);
             }
         }
     }
-    cursor_ = saved_cursor;
+    if (!s_node) cursor_ = saved_cursor;
 
-    // S -> NP VP AUX NP (Handles Tag Questions: "you will be available, won't you")
-    auto s_tag_question = std::make_unique<ParseNode>();
-    s_tag_question->label = "S";
-    s_tag_question->type = NodeType::NON_TERMINAL;
-    if (auto np1 = parse_NP()) {
-        s_tag_question->add_child(std::move(np1));
-        if (auto vp = parse_VP()) {
-            s_tag_question->add_child(std::move(vp));
-            if (consume(POS::AUX, s_tag_question.get())) {
-                if (auto np2 = parse_NP()) {
-                    s_tag_question->add_child(std::move(np2));
-                    
-        while (auto pp = parse_PP()) {
-            auto new_s = std::make_unique<ParseNode>();
-            new_s->label = "S";
-            new_s->type = NodeType::NON_TERMINAL;
-            new_s->add_child(std::move(s_tag_question));
-            new_s->add_child(std::move(pp));
-            s_tag_question = std::move(new_s);
-        }
-        return s_tag_question;
-
-                }
-            }
-        }
-    }
-    cursor_ = saved_cursor;
-
-    // S -> NP VP CONJ NP (Handles: "we will come, however the circumstance")
-    auto s_np_vp_conj_np = std::make_unique<ParseNode>();
-    s_np_vp_conj_np->label = "S";
-    s_np_vp_conj_np->type = NodeType::NON_TERMINAL;
-    if (auto np1 = parse_NP()) {
-        s_np_vp_conj_np->add_child(std::move(np1));
-        if (auto vp = parse_VP()) {
-            s_np_vp_conj_np->add_child(std::move(vp));
-            if (consume(POS::CONJ, s_np_vp_conj_np.get())) {
-                if (auto np2 = parse_NP()) {
-                    s_np_vp_conj_np->add_child(std::move(np2));
-                    
-        while (auto pp = parse_PP()) {
-            auto new_s = std::make_unique<ParseNode>();
-            new_s->label = "S";
-            new_s->type = NodeType::NON_TERMINAL;
-            new_s->add_child(std::move(s_np_vp_conj_np));
-            new_s->add_child(std::move(pp));
-            s_np_vp_conj_np = std::move(new_s);
-        }
-        return s_np_vp_conj_np;
-
-                }
-            }
-        }
-    }
-    cursor_ = saved_cursor;
-
-    // S -> NP AUX NP VP
-    auto s_np_aux = std::make_unique<ParseNode>();
-    s_np_aux->label = "S";
-    s_np_aux->type = NodeType::NON_TERMINAL;
-    if (auto np1 = parse_NP()) {
-        s_np_aux->add_child(std::move(np1));
-        if (consume(POS::AUX, s_np_aux.get())) {
-            if (auto np2 = parse_NP()) {
-                s_np_aux->add_child(std::move(np2));
-                if (auto vp = parse_VP()) {
-                    s_np_aux->add_child(std::move(vp));
-                    
-        while (auto pp = parse_PP()) {
-            auto new_s = std::make_unique<ParseNode>();
-            new_s->label = "S";
-            new_s->type = NodeType::NON_TERMINAL;
-            new_s->add_child(std::move(s_np_aux));
-            new_s->add_child(std::move(pp));
-            s_np_aux = std::move(new_s);
-        }
-        return s_np_aux;
-
-                }
-            }
-        }
-    }
-    cursor_ = saved_cursor;
-
-    // S -> NP VP PP
-    auto s1 = std::make_unique<ParseNode>();
-    s1->label = "S";
-    s1->type = NodeType::NON_TERMINAL;
-    if (auto np = parse_NP()) {
-        s1->add_child(std::move(np));
-        if (auto vp = parse_VP()) {
-            s1->add_child(std::move(vp));
-            if (auto pp = parse_PP()) {
-                s1->add_child(std::move(pp));
-                
-        while (auto pp = parse_PP()) {
-            auto new_s = std::make_unique<ParseNode>();
-            new_s->label = "S";
-            new_s->type = NodeType::NON_TERMINAL;
-            new_s->add_child(std::move(s1));
-            new_s->add_child(std::move(pp));
-            s1 = std::move(new_s);
-        }
-        return s1;
-
-            }
-        }
-    }
-    cursor_ = saved_cursor;
-
-    // S -> NP VP
-    auto s2 = std::make_unique<ParseNode>();
-    s2->label = "S";
-    s2->type = NodeType::NON_TERMINAL;
-    if (auto np = parse_NP()) {
-        s2->add_child(std::move(np));
-        if (auto vp = parse_VP()) {
-            s2->add_child(std::move(vp));
-            
-        while (auto pp = parse_PP()) {
-            auto new_s = std::make_unique<ParseNode>();
-            new_s->label = "S";
-            new_s->type = NodeType::NON_TERMINAL;
-            new_s->add_child(std::move(s2));
-            new_s->add_child(std::move(pp));
-            s2 = std::move(new_s);
-        }
-        return s2;
-
-        }
-    }
-    cursor_ = saved_cursor;
-
-    // S -> AUX NP VP
-    auto s_aux = std::make_unique<ParseNode>();
-    s_aux->label = "S";
-    s_aux->type = NodeType::NON_TERMINAL;
-    if (consume(POS::AUX, s_aux.get())) {
-        if (auto np = parse_NP()) {
-            s_aux->add_child(std::move(np));
+    if (!s_node) {
+        auto s_tag_question = std::make_unique<ParseNode>();
+        s_tag_question->label = "S";
+        s_tag_question->type = NodeType::NON_TERMINAL;
+        if (auto np1 = parse_NP()) {
+            s_tag_question->add_child(std::move(np1));
             if (auto vp = parse_VP()) {
-                s_aux->add_child(std::move(vp));
-                
-        while (auto pp = parse_PP()) {
-            auto new_s = std::make_unique<ParseNode>();
-            new_s->label = "S";
-            new_s->type = NodeType::NON_TERMINAL;
-            new_s->add_child(std::move(s_aux));
-            new_s->add_child(std::move(pp));
-            s_aux = std::move(new_s);
-        }
-        return s_aux;
-
+                s_tag_question->add_child(std::move(vp));
+                if (consume(POS::AUX, s_tag_question.get())) {
+                    if (auto np2 = parse_NP()) {
+                        s_tag_question->add_child(std::move(np2));
+                        s_node = std::move(s_tag_question);
+                    }
+                }
             }
         }
+        if (!s_node) cursor_ = saved_cursor;
     }
-    cursor_ = saved_cursor;
 
-    // S -> VP
-    auto s_vp = std::make_unique<ParseNode>();
-    s_vp->label = "S";
-    s_vp->type = NodeType::NON_TERMINAL;
-    if (auto vp = parse_VP()) {
-        s_vp->add_child(std::move(vp));
-        
-        while (auto pp = parse_PP()) {
-            auto new_s = std::make_unique<ParseNode>();
-            new_s->label = "S";
-            new_s->type = NodeType::NON_TERMINAL;
-            new_s->add_child(std::move(s_vp));
-            new_s->add_child(std::move(pp));
-            s_vp = std::move(new_s);
-        }
-        return s_vp;
-
-    }
-    cursor_ = saved_cursor;
-
-    // S -> INTJ S
-    auto s_intj_s = std::make_unique<ParseNode>();
-    s_intj_s->label = "S";
-    s_intj_s->type = NodeType::NON_TERMINAL;
-    if (consume(POS::INTJ, s_intj_s.get())) {
-        if (auto s = parse_S()) {
-            s_intj_s->add_child(std::move(s));
-            
-        while (auto pp = parse_PP()) {
-            auto new_s = std::make_unique<ParseNode>();
-            new_s->label = "S";
-            new_s->type = NodeType::NON_TERMINAL;
-            new_s->add_child(std::move(s_intj_s));
-            new_s->add_child(std::move(pp));
-            s_intj_s = std::move(new_s);
-        }
-        return s_intj_s;
-
-        }
-    }
-    cursor_ = saved_cursor;
-
-    // S -> INTJ NP ADV
-    auto s_intj_np_adv = std::make_unique<ParseNode>();
-    s_intj_np_adv->label = "S";
-    s_intj_np_adv->type = NodeType::NON_TERMINAL;
-    if (consume(POS::INTJ, s_intj_np_adv.get())) {
-        if (auto np = parse_NP()) {
-            s_intj_np_adv->add_child(std::move(np));
-            if (consume(POS::ADV, s_intj_np_adv.get())) {
-                
-        while (auto pp = parse_PP()) {
-            auto new_s = std::make_unique<ParseNode>();
-            new_s->label = "S";
-            new_s->type = NodeType::NON_TERMINAL;
-            new_s->add_child(std::move(s_intj_np_adv));
-            new_s->add_child(std::move(pp));
-            s_intj_np_adv = std::move(new_s);
-        }
-        return s_intj_np_adv;
-
+    if (!s_node) {
+        auto s_np_vp_conj_np = std::make_unique<ParseNode>();
+        s_np_vp_conj_np->label = "S";
+        s_np_vp_conj_np->type = NodeType::NON_TERMINAL;
+        if (auto np1 = parse_NP()) {
+            s_np_vp_conj_np->add_child(std::move(np1));
+            if (auto vp = parse_VP()) {
+                s_np_vp_conj_np->add_child(std::move(vp));
+                if (consume(POS::CONJ, s_np_vp_conj_np.get())) {
+                    if (auto np2 = parse_NP()) {
+                        s_np_vp_conj_np->add_child(std::move(np2));
+                        s_node = std::move(s_np_vp_conj_np);
+                    }
+                }
             }
         }
+        if (!s_node) cursor_ = saved_cursor;
     }
-    cursor_ = saved_cursor;
 
-    // S -> INTJ NP
-    auto s3 = std::make_unique<ParseNode>();
-    s3->label = "S";
-    s3->type = NodeType::NON_TERMINAL;
-    if (consume(POS::INTJ, s3.get())) {
+    if (!s_node) {
+        auto s_np_aux = std::make_unique<ParseNode>();
+        s_np_aux->label = "S";
+        s_np_aux->type = NodeType::NON_TERMINAL;
+        if (auto np1 = parse_NP()) {
+            s_np_aux->add_child(std::move(np1));
+            if (consume(POS::AUX, s_np_aux.get())) {
+                if (auto np2 = parse_NP()) {
+                    s_np_aux->add_child(std::move(np2));
+                    if (auto vp = parse_VP()) {
+                        s_np_aux->add_child(std::move(vp));
+                        s_node = std::move(s_np_aux);
+                    }
+                }
+            }
+        }
+        if (!s_node) cursor_ = saved_cursor;
+    }
+
+    if (!s_node) {
+        auto s2 = std::make_unique<ParseNode>();
+        s2->label = "S";
+        s2->type = NodeType::NON_TERMINAL;
         if (auto np = parse_NP()) {
-            s3->add_child(std::move(np));
-            
-        while (auto pp = parse_PP()) {
-            auto new_s = std::make_unique<ParseNode>();
-            new_s->label = "S";
-            new_s->type = NodeType::NON_TERMINAL;
-            new_s->add_child(std::move(s3));
-            new_s->add_child(std::move(pp));
-            s3 = std::move(new_s);
+            s2->add_child(std::move(np));
+            if (auto vp = parse_VP()) {
+                s2->add_child(std::move(vp));
+                s_node = std::move(s2);
+            }
         }
-        return s3;
-
-        }
+        if (!s_node) cursor_ = saved_cursor;
     }
-    cursor_ = saved_cursor;
 
-    // S -> INTJ
-    auto s4 = std::make_unique<ParseNode>();
-    s4->label = "S";
-    s4->type = NodeType::NON_TERMINAL;
-    if (consume(POS::INTJ, s4.get())) {
-        
-        while (auto pp = parse_PP()) {
-            auto new_s = std::make_unique<ParseNode>();
-            new_s->label = "S";
-            new_s->type = NodeType::NON_TERMINAL;
-            new_s->add_child(std::move(s4));
-            new_s->add_child(std::move(pp));
-            s4 = std::move(new_s);
+    if (!s_node) {
+        auto s_aux = std::make_unique<ParseNode>();
+        s_aux->label = "S";
+        s_aux->type = NodeType::NON_TERMINAL;
+        if (consume(POS::AUX, s_aux.get())) {
+            if (auto np = parse_NP()) {
+                s_aux->add_child(std::move(np));
+                if (auto vp = parse_VP()) {
+                    s_aux->add_child(std::move(vp));
+                    s_node = std::move(s_aux);
+                }
+            }
         }
-        return s4;
-
+        if (!s_node) cursor_ = saved_cursor;
     }
-    cursor_ = saved_cursor;
+
+    if (!s_node) {
+        auto s_vp = std::make_unique<ParseNode>();
+        s_vp->label = "S";
+        s_vp->type = NodeType::NON_TERMINAL;
+        if (auto vp = parse_VP()) {
+            s_vp->add_child(std::move(vp));
+            s_node = std::move(s_vp);
+        }
+        if (!s_node) cursor_ = saved_cursor;
+    }
+
+    if (!s_node) {
+        auto s_intj_s = std::make_unique<ParseNode>();
+        s_intj_s->label = "S";
+        s_intj_s->type = NodeType::NON_TERMINAL;
+        if (consume(POS::INTJ, s_intj_s.get())) {
+            if (auto s = parse_S()) {
+                s_intj_s->add_child(std::move(s));
+                s_node = std::move(s_intj_s);
+            }
+        }
+        if (!s_node) cursor_ = saved_cursor;
+    }
+
+    if (!s_node) {
+        auto s_intj_np_adv = std::make_unique<ParseNode>();
+        s_intj_np_adv->label = "S";
+        s_intj_np_adv->type = NodeType::NON_TERMINAL;
+        if (consume(POS::INTJ, s_intj_np_adv.get())) {
+            if (auto np = parse_NP()) {
+                s_intj_np_adv->add_child(std::move(np));
+                if (consume(POS::ADV, s_intj_np_adv.get())) {
+                    s_node = std::move(s_intj_np_adv);
+                }
+            }
+        }
+        if (!s_node) cursor_ = saved_cursor;
+    }
+
+    if (!s_node) {
+        auto s3 = std::make_unique<ParseNode>();
+        s3->label = "S";
+        s3->type = NodeType::NON_TERMINAL;
+        if (consume(POS::INTJ, s3.get())) {
+            if (auto np = parse_NP()) {
+                s3->add_child(std::move(np));
+                s_node = std::move(s3);
+            }
+        }
+        if (!s_node) cursor_ = saved_cursor;
+    }
+
+    if (!s_node) {
+        auto s4 = std::make_unique<ParseNode>();
+        s4->label = "S";
+        s4->type = NodeType::NON_TERMINAL;
+        if (consume(POS::INTJ, s4.get())) {
+            s_node = std::move(s4);
+        }
+        if (!s_node) cursor_ = saved_cursor;
+    }
+
+    if (s_node) {
+        bool matched = true;
+        while (matched) {
+            if (auto extra_pp = parse_PP()) {
+                auto wrapped = std::make_unique<ParseNode>();
+                wrapped->label = "S";
+                wrapped->type = NodeType::NON_TERMINAL;
+                wrapped->add_child(std::move(s_node));
+                wrapped->add_child(std::move(extra_pp));
+                s_node = std::move(wrapped);
+            } else if (current().tag == POS::ADV) {
+                auto leaf = std::make_unique<ParseNode>();
+                leaf->label = "ADV";
+                leaf->lexeme = current().word;
+                leaf->type = NodeType::TERMINAL;
+                cursor_++;
+                auto wrapped = std::make_unique<ParseNode>();
+                wrapped->label = "S";
+                wrapped->type = NodeType::NON_TERMINAL;
+                wrapped->add_child(std::move(s_node));
+                wrapped->add_child(std::move(leaf));
+                s_node = std::move(wrapped);
+            } else {
+                matched = false;
+            }
+        }
+        return s_node;
+    }
     
     return nullptr;
 }
 
 std::unique_ptr<ParseNode> TopDownParser::parse_NP() {
     size_t saved_cursor = cursor_;
-
-    // NP -> DET ADJ N
-    auto np_dan = std::make_unique<ParseNode>();
-    np_dan->label = "NP";
-    np_dan->type = NodeType::NON_TERMINAL;
-    if (consume(POS::DET, np_dan.get()) && consume(POS::ADJ, np_dan.get()) && consume(POS::N, np_dan.get())) {
-        return np_dan;
-    }
+    
+    // 0a. NP -> DET NUM N
+    auto np_dnn2 = std::make_unique<ParseNode>();
+    np_dnn2->label = "NP";
+    np_dnn2->type = NodeType::NON_TERMINAL;
+    if (consume(POS::DET, np_dnn2.get()) && consume(POS::NUM, np_dnn2.get()) && consume(POS::N, np_dnn2.get())) return np_dnn2;
     cursor_ = saved_cursor;
 
+    // 0b. NP -> NUM ADJ N
+    auto np_nan = std::make_unique<ParseNode>();
+    np_nan->label = "NP";
+    np_nan->type = NodeType::NON_TERMINAL;
+    if (consume(POS::NUM, np_nan.get()) && consume(POS::ADJ, np_nan.get()) && consume(POS::N, np_nan.get())) return np_nan;
+    cursor_ = saved_cursor;
 
-    
-    // NP -> DET ADJ ADJ N
+    // 0c. NP -> NUM N
+    auto np_nn2 = std::make_unique<ParseNode>();
+    np_nn2->label = "NP";
+    np_nn2->type = NodeType::NON_TERMINAL;
+    if (consume(POS::NUM, np_nn2.get()) && consume(POS::N, np_nn2.get())) return np_nn2;
+    cursor_ = saved_cursor;
+
+    // 1. NP -> DET ADJ ADJ N
     auto np1 = std::make_unique<ParseNode>();
     np1->label = "NP";
     np1->type = NodeType::NON_TERMINAL;
-    if (consume(POS::DET, np1.get()) &&
-        consume(POS::ADJ, np1.get()) &&
-        consume(POS::ADJ, np1.get()) &&
-        consume(POS::N, np1.get())) {
-        return np1;
-    }
+    if (consume(POS::DET, np1.get()) && consume(POS::ADJ, np1.get()) && consume(POS::ADJ, np1.get()) && consume(POS::N, np1.get())) return np1;
     cursor_ = saved_cursor;
 
-    // NP -> DET ADJ N
-    auto np2 = std::make_unique<ParseNode>();
-    np2->label = "NP";
-    np2->type = NodeType::NON_TERMINAL;
-    if (consume(POS::DET, np2.get()) &&
-        consume(POS::ADJ, np2.get()) &&
-        consume(POS::N, np2.get())) {
-        return np2;
-    }
+    // 1a. NP -> DET V N N
+    auto np_dvnn = std::make_unique<ParseNode>();
+    np_dvnn->label = "NP";
+    np_dvnn->type = NodeType::NON_TERMINAL;
+    if (consume(POS::DET, np_dvnn.get()) && consume(POS::V, np_dvnn.get()) && consume(POS::N, np_dvnn.get()) && consume(POS::N, np_dvnn.get())) return np_dvnn;
     cursor_ = saved_cursor;
 
+    // 1b. NP -> DET V N
+    auto np_dvn = std::make_unique<ParseNode>();
+    np_dvn->label = "NP";
+    np_dvn->type = NodeType::NON_TERMINAL;
+    if (consume(POS::DET, np_dvn.get()) && consume(POS::V, np_dvn.get()) && consume(POS::N, np_dvn.get())) return np_dvn;
+    cursor_ = saved_cursor;
 
-    // NP -> DET N N
+    // 2. NP -> DET ADJ N
+    auto np_dan = std::make_unique<ParseNode>();
+    np_dan->label = "NP";
+    np_dan->type = NodeType::NON_TERMINAL;
+    if (consume(POS::DET, np_dan.get()) && consume(POS::ADJ, np_dan.get()) && consume(POS::N, np_dan.get())) return np_dan;
+    cursor_ = saved_cursor;
+
+    // 3a. NP -> DET N N N
+    auto np_dnnn = std::make_unique<ParseNode>();
+    np_dnnn->label = "NP";
+    np_dnnn->type = NodeType::NON_TERMINAL;
+    if (consume(POS::DET, np_dnnn.get()) && consume(POS::N, np_dnnn.get()) && consume(POS::N, np_dnnn.get()) && consume(POS::N, np_dnnn.get())) return np_dnnn;
+    cursor_ = saved_cursor;
+
+    // 3. NP -> DET N N
     auto np_dnn = std::make_unique<ParseNode>();
     np_dnn->label = "NP";
     np_dnn->type = NodeType::NON_TERMINAL;
-    if (consume(POS::DET, np_dnn.get()) &&
-        consume(POS::N, np_dnn.get()) &&
-        consume(POS::N, np_dnn.get())) {
-        return np_dnn;
-    }
+    if (consume(POS::DET, np_dnn.get()) && consume(POS::N, np_dnn.get()) && consume(POS::N, np_dnn.get())) return np_dnn;
     cursor_ = saved_cursor;
 
-    // NP -> N N
-    auto np_nn = std::make_unique<ParseNode>();
-    np_nn->label = "NP";
-    np_nn->type = NodeType::NON_TERMINAL;
-    if (consume(POS::N, np_nn.get()) &&
-        consume(POS::N, np_nn.get())) {
-        return np_nn;
-    }
-    cursor_ = saved_cursor;
-
-    // NP -> DET N
+    // 4. NP -> DET N
     auto np3 = std::make_unique<ParseNode>();
     np3->label = "NP";
     np3->type = NodeType::NON_TERMINAL;
-    if (consume(POS::DET, np3.get()) &&
-        consume(POS::N, np3.get())) {
-        return np3;
-    }
+    if (consume(POS::DET, np3.get()) && consume(POS::N, np3.get())) return np3;
     cursor_ = saved_cursor;
 
-    // NP -> PRON
+    // 4a. NP -> N N N
+    auto np_nnn = std::make_unique<ParseNode>();
+    np_nnn->label = "NP";
+    np_nnn->type = NodeType::NON_TERMINAL;
+    if (consume(POS::N, np_nnn.get()) && consume(POS::N, np_nnn.get()) && consume(POS::N, np_nnn.get())) return np_nnn;
+    cursor_ = saved_cursor;
+
+    // 5. NP -> N N
+    auto np_nn = std::make_unique<ParseNode>();
+    np_nn->label = "NP";
+    np_nn->type = NodeType::NON_TERMINAL;
+    if (consume(POS::N, np_nn.get()) && consume(POS::N, np_nn.get())) return np_nn;
+    cursor_ = saved_cursor;
+
+    // 6. NP -> V N
+    auto np_vn = std::make_unique<ParseNode>();
+    np_vn->label = "NP";
+    np_vn->type = NodeType::NON_TERMINAL;
+    if (consume(POS::V, np_vn.get()) && consume(POS::N, np_vn.get())) return np_vn;
+    cursor_ = saved_cursor;
+
+    // 6a. NP -> ADJ ADJ N
+    auto np_aan = std::make_unique<ParseNode>();
+    np_aan->label = "NP";
+    np_aan->type = NodeType::NON_TERMINAL;
+    if (consume(POS::ADJ, np_aan.get()) && consume(POS::ADJ, np_aan.get()) && consume(POS::N, np_aan.get())) return np_aan;
+    cursor_ = saved_cursor;
+
+    // 6b. NP -> ADJ N
+    auto np_an = std::make_unique<ParseNode>();
+    np_an->label = "NP";
+    np_an->type = NodeType::NON_TERMINAL;
+    if (consume(POS::ADJ, np_an.get()) && consume(POS::N, np_an.get())) return np_an;
+    cursor_ = saved_cursor;
+
+    // 6c. NP -> ADJ V
+    auto np_av = std::make_unique<ParseNode>();
+    np_av->label = "NP";
+    np_av->type = NodeType::NON_TERMINAL;
+    if (consume(POS::ADJ, np_av.get()) && consume(POS::V, np_av.get())) return np_av;
+    cursor_ = saved_cursor;
+
+    // 6d. NP -> V
+    auto np_v = std::make_unique<ParseNode>();
+    np_v->label = "NP";
+    np_v->type = NodeType::NON_TERMINAL;
+    if (consume(POS::V, np_v.get())) return np_v;
+    cursor_ = saved_cursor;
+
+    // 7. NP -> PRON
     auto np4 = std::make_unique<ParseNode>();
     np4->label = "NP";
     np4->type = NodeType::NON_TERMINAL;
-    if (consume(POS::PRON, np4.get())) {
-        return np4;
-    }
+    if (consume(POS::PRON, np4.get())) return np4;
     cursor_ = saved_cursor;
 
-    // NP -> PROPER_N
+    // 8. NP -> PROPER_N
     auto np5 = std::make_unique<ParseNode>();
     np5->label = "NP";
     np5->type = NodeType::NON_TERMINAL;
-    if (consume(POS::PROPER_N, np5.get())) {
-        return np5;
-    }
+    if (consume(POS::PROPER_N, np5.get())) return np5;
     cursor_ = saved_cursor;
 
-    // NP -> N
+    // 9. NP -> N
     auto np6 = std::make_unique<ParseNode>();
     np6->label = "NP";
     np6->type = NodeType::NON_TERMINAL;
-    if (consume(POS::N, np6.get())) {
-        return np6;
-    }
+    if (consume(POS::N, np6.get())) return np6;
     cursor_ = saved_cursor;
 
     return nullptr;
@@ -7935,418 +8113,209 @@ std::unique_ptr<ParseNode> TopDownParser::parse_NP() {
 
 std::unique_ptr<ParseNode> TopDownParser::parse_VP() {
     size_t saved_cursor = cursor_;
+    std::unique_ptr<ParseNode> vp_node = nullptr;
 
-    // VP -> AUX V NP ADV
     auto vp_aux_v_np_adv = std::make_unique<ParseNode>();
     vp_aux_v_np_adv->label = "VP";
     vp_aux_v_np_adv->type = NodeType::NON_TERMINAL;
     if (consume(POS::AUX, vp_aux_v_np_adv.get()) && consume(POS::V, vp_aux_v_np_adv.get())) {
         if (auto np = parse_NP()) {
             vp_aux_v_np_adv->add_child(std::move(np));
-            if (consume(POS::ADV, vp_aux_v_np_adv.get())) {
-                
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp_aux_v_np_adv));
-            new_vp->add_child(std::move(pp));
-            vp_aux_v_np_adv = std::move(new_vp);
-        }
-        return vp_aux_v_np_adv;
-
-            }
+            if (consume(POS::ADV, vp_aux_v_np_adv.get())) vp_node = std::move(vp_aux_v_np_adv);
         }
     }
-    cursor_ = saved_cursor;
+    if (!vp_node) cursor_ = saved_cursor;
 
-    // VP -> AUX V NP PP
-    auto vp_aux1 = std::make_unique<ParseNode>();
-    vp_aux1->label = "VP";
-    vp_aux1->type = NodeType::NON_TERMINAL;
-    if (consume(POS::AUX, vp_aux1.get()) && consume(POS::V, vp_aux1.get())) {
-        if (auto np = parse_NP()) {
-            vp_aux1->add_child(std::move(np));
+    if (!vp_node) {
+        auto vp_aux2 = std::make_unique<ParseNode>();
+        vp_aux2->label = "VP";
+        vp_aux2->type = NodeType::NON_TERMINAL;
+        if (consume(POS::AUX, vp_aux2.get()) && consume(POS::V, vp_aux2.get())) {
+            if (auto np = parse_NP()) {
+                vp_aux2->add_child(std::move(np));
+                vp_node = std::move(vp_aux2);
+            }
+        }
+        if (!vp_node) cursor_ = saved_cursor;
+    }
+
+    if (!vp_node) {
+        auto vp_aux_v_adv = std::make_unique<ParseNode>();
+        vp_aux_v_adv->label = "VP";
+        vp_aux_v_adv->type = NodeType::NON_TERMINAL;
+        if (consume(POS::AUX, vp_aux_v_adv.get()) && consume(POS::V, vp_aux_v_adv.get()) && consume(POS::ADV, vp_aux_v_adv.get())) {
+            vp_node = std::move(vp_aux_v_adv);
+        }
+        if (!vp_node) cursor_ = saved_cursor;
+    }
+
+    if (!vp_node) {
+        auto vp_aux_adv_v = std::make_unique<ParseNode>();
+        vp_aux_adv_v->label = "VP";
+        vp_aux_adv_v->type = NodeType::NON_TERMINAL;
+        if (consume(POS::AUX, vp_aux_adv_v.get()) && consume(POS::ADV, vp_aux_adv_v.get()) && consume(POS::V, vp_aux_adv_v.get())) {
+            vp_node = std::move(vp_aux_adv_v);
+        }
+        if (!vp_node) cursor_ = saved_cursor;
+    }
+
+    if (!vp_node) {
+        auto vp_aux3 = std::make_unique<ParseNode>();
+        vp_aux3->label = "VP";
+        vp_aux3->type = NodeType::NON_TERMINAL;
+        if (consume(POS::AUX, vp_aux3.get()) && consume(POS::V, vp_aux3.get())) {
+            vp_node = std::move(vp_aux3);
+        }
+        if (!vp_node) cursor_ = saved_cursor;
+    }
+
+    if (!vp_node) {
+        auto vp_aux_adv = std::make_unique<ParseNode>();
+        vp_aux_adv->label = "VP";
+        vp_aux_adv->type = NodeType::NON_TERMINAL;
+        if (consume(POS::AUX, vp_aux_adv.get()) && consume(POS::ADV, vp_aux_adv.get())) {
+            vp_node = std::move(vp_aux_adv);
+        }
+        if (!vp_node) cursor_ = saved_cursor;
+    }
+
+    if (!vp_node) {
+        auto vp_aux_np_adv = std::make_unique<ParseNode>();
+        vp_aux_np_adv->label = "VP";
+        vp_aux_np_adv->type = NodeType::NON_TERMINAL;
+        if (consume(POS::AUX, vp_aux_np_adv.get())) {
+            if (auto np = parse_NP()) {
+                vp_aux_np_adv->add_child(std::move(np));
+                if (consume(POS::ADV, vp_aux_np_adv.get())) vp_node = std::move(vp_aux_np_adv);
+            }
+        }
+        if (!vp_node) cursor_ = saved_cursor;
+    }
+
+    if (!vp_node) {
+        auto vp_aux_np = std::make_unique<ParseNode>();
+        vp_aux_np->label = "VP";
+        vp_aux_np->type = NodeType::NON_TERMINAL;
+        if (consume(POS::AUX, vp_aux_np.get())) {
+            if (auto np = parse_NP()) {
+                vp_aux_np->add_child(std::move(np));
+                vp_node = std::move(vp_aux_np);
+            }
+        }
+        if (!vp_node) cursor_ = saved_cursor;
+    }
+
+    if (!vp_node) {
+        auto vp_aux_pp = std::make_unique<ParseNode>();
+        vp_aux_pp->label = "VP";
+        vp_aux_pp->type = NodeType::NON_TERMINAL;
+        if (consume(POS::AUX, vp_aux_pp.get())) {
             if (auto pp = parse_PP()) {
-                vp_aux1->add_child(std::move(pp));
-                
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp_aux1));
-            new_vp->add_child(std::move(pp));
-            vp_aux1 = std::move(new_vp);
-        }
-        return vp_aux1;
-
+                vp_aux_pp->add_child(std::move(pp));
+                vp_node = std::move(vp_aux_pp);
             }
         }
+        if (!vp_node) cursor_ = saved_cursor;
     }
-    cursor_ = saved_cursor;
 
-    // VP -> AUX V NP
-    auto vp_aux2 = std::make_unique<ParseNode>();
-    vp_aux2->label = "VP";
-    vp_aux2->type = NodeType::NON_TERMINAL;
-    if (consume(POS::AUX, vp_aux2.get()) && consume(POS::V, vp_aux2.get())) {
-        if (auto np = parse_NP()) {
-            vp_aux2->add_child(std::move(np));
-            
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp_aux2));
-            new_vp->add_child(std::move(pp));
-            vp_aux2 = std::move(new_vp);
+    if (!vp_node) {
+        auto vp_aux_adj = std::make_unique<ParseNode>();
+        vp_aux_adj->label = "VP";
+        vp_aux_adj->type = NodeType::NON_TERMINAL;
+        if (consume(POS::AUX, vp_aux_adj.get()) && consume(POS::ADJ, vp_aux_adj.get())) {
+            vp_node = std::move(vp_aux_adj);
         }
-        return vp_aux2;
-
-        }
+        if (!vp_node) cursor_ = saved_cursor;
     }
-    cursor_ = saved_cursor;
 
-    // VP -> AUX V PP
-    auto vp_aux_v_pp = std::make_unique<ParseNode>();
-    vp_aux_v_pp->label = "VP";
-    vp_aux_v_pp->type = NodeType::NON_TERMINAL;
-    if (consume(POS::AUX, vp_aux_v_pp.get()) && consume(POS::V, vp_aux_v_pp.get())) {
-        if (auto pp = parse_PP()) {
-            vp_aux_v_pp->add_child(std::move(pp));
-            
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp_aux_v_pp));
-            new_vp->add_child(std::move(pp));
-            vp_aux_v_pp = std::move(new_vp);
-        }
-        return vp_aux_v_pp;
-
-        }
-    }
-    cursor_ = saved_cursor;
-
-    // VP -> AUX V ADV
-    auto vp_aux_v_adv = std::make_unique<ParseNode>();
-    vp_aux_v_adv->label = "VP";
-    vp_aux_v_adv->type = NodeType::NON_TERMINAL;
-    if (consume(POS::AUX, vp_aux_v_adv.get()) && consume(POS::V, vp_aux_v_adv.get()) && consume(POS::ADV, vp_aux_v_adv.get())) {
-        
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp_aux_v_adv));
-            new_vp->add_child(std::move(pp));
-            vp_aux_v_adv = std::move(new_vp);
-        }
-        return vp_aux_v_adv;
-
-    }
-    cursor_ = saved_cursor;
-
-    // VP -> AUX ADV V
-    auto vp_aux_adv_v = std::make_unique<ParseNode>();
-    vp_aux_adv_v->label = "VP";
-    vp_aux_adv_v->type = NodeType::NON_TERMINAL;
-    if (consume(POS::AUX, vp_aux_adv_v.get()) && consume(POS::ADV, vp_aux_adv_v.get()) && consume(POS::V, vp_aux_adv_v.get())) {
-        
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp_aux_adv_v));
-            new_vp->add_child(std::move(pp));
-            vp_aux_adv_v = std::move(new_vp);
-        }
-        return vp_aux_adv_v;
-
-    }
-    cursor_ = saved_cursor;
-
-    // VP -> AUX V
-    auto vp_aux3 = std::make_unique<ParseNode>();
-    vp_aux3->label = "VP";
-    vp_aux3->type = NodeType::NON_TERMINAL;
-    if (consume(POS::AUX, vp_aux3.get()) && consume(POS::V, vp_aux3.get())) {
-        
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp_aux3));
-            new_vp->add_child(std::move(pp));
-            vp_aux3 = std::move(new_vp);
-        }
-        return vp_aux3;
-
-    }
-    cursor_ = saved_cursor;
-
-    // VP -> AUX ADV
-    auto vp_aux_adv = std::make_unique<ParseNode>();
-    vp_aux_adv->label = "VP";
-    vp_aux_adv->type = NodeType::NON_TERMINAL;
-    if (consume(POS::AUX, vp_aux_adv.get()) && consume(POS::ADV, vp_aux_adv.get())) {
-        
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp_aux_adv));
-            new_vp->add_child(std::move(pp));
-            vp_aux_adv = std::move(new_vp);
-        }
-        return vp_aux_adv;
-
-    }
-    cursor_ = saved_cursor;
-
-    // VP -> AUX NP PP
-    auto vp_aux_np_pp = std::make_unique<ParseNode>();
-    vp_aux_np_pp->label = "VP";
-    vp_aux_np_pp->type = NodeType::NON_TERMINAL;
-    if (consume(POS::AUX, vp_aux_np_pp.get())) {
-        if (auto np = parse_NP()) {
-            vp_aux_np_pp->add_child(std::move(np));
-            if (auto pp = parse_PP()) {
-                vp_aux_np_pp->add_child(std::move(pp));
-                
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp_aux_np_pp));
-            new_vp->add_child(std::move(pp));
-            vp_aux_np_pp = std::move(new_vp);
-        }
-        return vp_aux_np_pp;
-
+    if (!vp_node) {
+        auto vp_aux_vp = std::make_unique<ParseNode>();
+        vp_aux_vp->label = "VP";
+        vp_aux_vp->type = NodeType::NON_TERMINAL;
+        if (consume(POS::AUX, vp_aux_vp.get())) {
+            if (auto vp_child = parse_VP()) {
+                vp_aux_vp->add_child(std::move(vp_child));
+                vp_node = std::move(vp_aux_vp);
             }
         }
+        if (!vp_node) cursor_ = saved_cursor;
     }
-    cursor_ = saved_cursor;
 
-    // VP -> AUX NP ADV
-    auto vp_aux_np_adv = std::make_unique<ParseNode>();
-    vp_aux_np_adv->label = "VP";
-    vp_aux_np_adv->type = NodeType::NON_TERMINAL;
-    if (consume(POS::AUX, vp_aux_np_adv.get())) {
-        if (auto np = parse_NP()) {
-            vp_aux_np_adv->add_child(std::move(np));
-            if (consume(POS::ADV, vp_aux_np_adv.get())) {
-                
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp_aux_np_adv));
-            new_vp->add_child(std::move(pp));
-            vp_aux_np_adv = std::move(new_vp);
-        }
-        return vp_aux_np_adv;
-
+    if (!vp_node) {
+        auto vp_v_np_adv = std::make_unique<ParseNode>();
+        vp_v_np_adv->label = "VP";
+        vp_v_np_adv->type = NodeType::NON_TERMINAL;
+        if (consume(POS::V, vp_v_np_adv.get())) {
+            if (auto np = parse_NP()) {
+                vp_v_np_adv->add_child(std::move(np));
+                if (consume(POS::ADV, vp_v_np_adv.get())) vp_node = std::move(vp_v_np_adv);
             }
         }
+        if (!vp_node) cursor_ = saved_cursor;
     }
-    cursor_ = saved_cursor;
 
-    // VP -> AUX NP
-    auto vp_aux_np = std::make_unique<ParseNode>();
-    vp_aux_np->label = "VP";
-    vp_aux_np->type = NodeType::NON_TERMINAL;
-    if (consume(POS::AUX, vp_aux_np.get())) {
-        if (auto np = parse_NP()) {
-            vp_aux_np->add_child(std::move(np));
-            
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp_aux_np));
-            new_vp->add_child(std::move(pp));
-            vp_aux_np = std::move(new_vp);
-        }
-        return vp_aux_np;
-
-        }
-    }
-    cursor_ = saved_cursor;
-
-    // VP -> AUX ADJ
-    auto vp_aux_adj = std::make_unique<ParseNode>();
-    vp_aux_adj->label = "VP";
-    vp_aux_adj->type = NodeType::NON_TERMINAL;
-    if (consume(POS::AUX, vp_aux_adj.get()) && consume(POS::ADJ, vp_aux_adj.get())) {
-        
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp_aux_adj));
-            new_vp->add_child(std::move(pp));
-            vp_aux_adj = std::move(new_vp);
-        }
-        return vp_aux_adj;
-
-    }
-    cursor_ = saved_cursor;
-
-    // VP -> AUX VP (Recursive Stacking)
-    auto vp_aux_vp = std::make_unique<ParseNode>();
-    vp_aux_vp->label = "VP";
-    vp_aux_vp->type = NodeType::NON_TERMINAL;
-    if (consume(POS::AUX, vp_aux_vp.get())) {
-        if (auto vp_child = parse_VP()) {
-            vp_aux_vp->add_child(std::move(vp_child));
-            
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp_aux_vp));
-            new_vp->add_child(std::move(pp));
-            vp_aux_vp = std::move(new_vp);
-        }
-        return vp_aux_vp;
-
-        }
-    }
-    cursor_ = saved_cursor;
-
-    // VP -> V NP PP
-    auto vp1 = std::make_unique<ParseNode>();
-    vp1->label = "VP";
-    vp1->type = NodeType::NON_TERMINAL;
-    if (consume(POS::V, vp1.get())) {
-        if (auto np = parse_NP()) {
-            vp1->add_child(std::move(np));
-            if (auto pp = parse_PP()) {
-                vp1->add_child(std::move(pp));
-                
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp1));
-            new_vp->add_child(std::move(pp));
-            vp1 = std::move(new_vp);
-        }
-        return vp1;
-
+    if (!vp_node) {
+        auto vp2 = std::make_unique<ParseNode>();
+        vp2->label = "VP";
+        vp2->type = NodeType::NON_TERMINAL;
+        if (consume(POS::V, vp2.get())) {
+            if (auto np = parse_NP()) {
+                vp2->add_child(std::move(np));
+                vp_node = std::move(vp2);
             }
         }
+        if (!vp_node) cursor_ = saved_cursor;
     }
-    cursor_ = saved_cursor;
 
-    // VP -> V NP ADV
-    auto vp_v_np_adv = std::make_unique<ParseNode>();
-    vp_v_np_adv->label = "VP";
-    vp_v_np_adv->type = NodeType::NON_TERMINAL;
-    if (consume(POS::V, vp_v_np_adv.get())) {
-        if (auto np = parse_NP()) {
-            vp_v_np_adv->add_child(std::move(np));
-            if (consume(POS::ADV, vp_v_np_adv.get())) {
-                
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp_v_np_adv));
-            new_vp->add_child(std::move(pp));
-            vp_v_np_adv = std::move(new_vp);
+    if (!vp_node) {
+        auto vp4 = std::make_unique<ParseNode>();
+        vp4->label = "VP";
+        vp4->type = NodeType::NON_TERMINAL;
+        if (consume(POS::V, vp4.get()) && consume(POS::ADV, vp4.get())) {
+            vp_node = std::move(vp4);
         }
-        return vp_v_np_adv;
+        if (!vp_node) cursor_ = saved_cursor;
+    }
 
+    if (!vp_node) {
+        auto vp5 = std::make_unique<ParseNode>();
+        vp5->label = "VP";
+        vp5->type = NodeType::NON_TERMINAL;
+        if (consume(POS::V, vp5.get())) {
+            vp_node = std::move(vp5);
+        }
+        if (!vp_node) cursor_ = saved_cursor;
+    }
+
+    // PP Wrapping loop for all valid VPs
+    if (vp_node) {
+        bool matched = true;
+        while (matched) {
+            if (auto extra_pp = parse_PP()) {
+                auto wrapped = std::make_unique<ParseNode>();
+                wrapped->label = "VP";
+                wrapped->type = NodeType::NON_TERMINAL;
+                wrapped->add_child(std::move(vp_node));
+                wrapped->add_child(std::move(extra_pp));
+                vp_node = std::move(wrapped);
+            } else if (current().tag == POS::ADV) {
+                auto leaf = std::make_unique<ParseNode>();
+                leaf->label = "ADV";
+                leaf->lexeme = current().word;
+                leaf->type = NodeType::TERMINAL;
+                cursor_++;
+                auto wrapped = std::make_unique<ParseNode>();
+                wrapped->label = "VP";
+                wrapped->type = NodeType::NON_TERMINAL;
+                wrapped->add_child(std::move(vp_node));
+                wrapped->add_child(std::move(leaf));
+                vp_node = std::move(wrapped);
+            } else {
+                matched = false;
             }
         }
+        return vp_node;
     }
-    cursor_ = saved_cursor;
-
-    // VP -> V NP
-    auto vp2 = std::make_unique<ParseNode>();
-    vp2->label = "VP";
-    vp2->type = NodeType::NON_TERMINAL;
-    if (consume(POS::V, vp2.get())) {
-        if (auto np = parse_NP()) {
-            vp2->add_child(std::move(np));
-            
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp2));
-            new_vp->add_child(std::move(pp));
-            vp2 = std::move(new_vp);
-        }
-        return vp2;
-
-        }
-    }
-    cursor_ = saved_cursor;
-
-    // VP -> V PP
-    auto vp3 = std::make_unique<ParseNode>();
-    vp3->label = "VP";
-    vp3->type = NodeType::NON_TERMINAL;
-    if (consume(POS::V, vp3.get())) {
-        if (auto pp = parse_PP()) {
-            vp3->add_child(std::move(pp));
-            
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp3));
-            new_vp->add_child(std::move(pp));
-            vp3 = std::move(new_vp);
-        }
-        return vp3;
-
-        }
-    }
-    cursor_ = saved_cursor;
-
-    // VP -> V ADV
-    auto vp4 = std::make_unique<ParseNode>();
-    vp4->label = "VP";
-    vp4->type = NodeType::NON_TERMINAL;
-    if (consume(POS::V, vp4.get()) && consume(POS::ADV, vp4.get())) {
-        
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp4));
-            new_vp->add_child(std::move(pp));
-            vp4 = std::move(new_vp);
-        }
-        return vp4;
-
-    }
-    cursor_ = saved_cursor;
-
-    // VP -> V
-    auto vp5 = std::make_unique<ParseNode>();
-    vp5->label = "VP";
-    vp5->type = NodeType::NON_TERMINAL;
-    if (consume(POS::V, vp5.get())) {
-        
-        while (auto pp = parse_PP()) {
-            auto new_vp = std::make_unique<ParseNode>();
-            new_vp->label = "VP";
-            new_vp->type = NodeType::NON_TERMINAL;
-            new_vp->add_child(std::move(vp5));
-            new_vp->add_child(std::move(pp));
-            vp5 = std::move(new_vp);
-        }
-        return vp5;
-
-    }
-    cursor_ = saved_cursor;
 
     return nullptr;
 }
@@ -8457,388 +8426,6 @@ std::unique_ptr<ParseNode> TopDownParser::parse_FACTOR() {
 
 ```
 
-## File: `tests/fixtures/sentences.txt`
-
-```text
-The dog sees a cat
-The quick brown fox jumps over the lazy dog
-A man is holding a book
-The tall child walks to the house
-She gives a good book
-The cat runs quickly
-3 + 4 * 2
-(5 + 2) * 8
-10 - 2 + 5 * (3 + 4)
-7 * 8 + 9 / 3
-
-```
-
-## File: `tests/test_bottom_up.cpp`
-
-```cpp
-#include <gtest/gtest.h>
-#include "lexer.h"
-#include "bottom_up_parser.h"
-
-std::unique_ptr<ParseNode> parse_bu(const std::string& input) {
-    Lexer lexer(input);
-    auto tokens = lexer.tokenize();
-    BottomUpParser parser(tokens);
-    return parser.parse();
-}
-
-TEST(BottomUpTest, SimpleSentence) {
-    auto tree = parse_bu("The cat runs");
-    ASSERT_NE(tree, nullptr);
-    EXPECT_EQ(tree->label, "S");
-    EXPECT_EQ(tree->children[0]->label, "NP");
-    EXPECT_EQ(tree->children[1]->label, "VP");
-}
-
-TEST(BottomUpTest, ComplexSentence) {
-    auto tree = parse_bu("The quick brown fox jumps over the lazy dog");
-    ASSERT_NE(tree, nullptr);
-    EXPECT_EQ(tree->label, "S");
-    EXPECT_EQ(tree->children[0]->label, "NP");
-    EXPECT_EQ(tree->children[1]->label, "VP");
-    EXPECT_EQ(tree->children[1]->children.size(), 2);
-    EXPECT_EQ(tree->children[1]->children[1]->label, "PP");
-}
-
-TEST(BottomUpTest, PronounSentence) {
-    auto tree = parse_bu("She loves him");
-    ASSERT_NE(tree, nullptr);
-    EXPECT_EQ(tree->label, "S");
-    EXPECT_EQ(tree->children[0]->label, "NP");
-    EXPECT_EQ(tree->children[0]->children[0]->lexeme, "She");
-}
-
-TEST(BottomUpTest, PrepositionalPhrase) {
-    auto tree = parse_bu("The dog sleeps in the house");
-    ASSERT_NE(tree, nullptr);
-    EXPECT_EQ(tree->label, "S");
-    EXPECT_EQ(tree->children.size(), 2);
-    EXPECT_EQ(tree->children[1]->children.size(), 2); // V and PP
-    EXPECT_EQ(tree->children[1]->children[1]->label, "PP");
-}
-
-TEST(BottomUpTest, BareNounVerb) {
-    auto tree = parse_bu("fox jumps");
-    ASSERT_NE(tree, nullptr);
-    EXPECT_EQ(tree->label, "S");
-}
-
-TEST(BottomUpTest, FailsOnNonsense) {
-    auto tree = parse_bu("jumps the the");
-    EXPECT_EQ(tree, nullptr);
-}
-
-TEST(BottomUpTest, IncompleteSentence) {
-    auto tree = parse_bu("The dog");
-    EXPECT_EQ(tree, nullptr);
-}
-
-TEST(BottomUpTest, AuxiliaryVerb) {
-    auto tree = parse_bu("The dog is running");
-    ASSERT_NE(tree, nullptr);
-    EXPECT_EQ(tree->children[1]->label, "VP");
-    EXPECT_EQ(tree->children[1]->children[0]->label, "AUX");
-}
-
-```
-
-## File: `tests/test_display.cpp`
-
-```cpp
-#include <gtest/gtest.h>
-#include "parse_tree.h"
-#include "display.h"
-#include <sstream>
-
-TEST(DisplayTest, SimpleTreeRendering) {
-    auto root = std::make_unique<ParseNode>();
-    root->label = "S";
-    root->type = NodeType::NON_TERMINAL;
-
-    auto np = std::make_unique<ParseNode>();
-    np->label = "NP";
-    np->type = NodeType::NON_TERMINAL;
-
-    auto det = std::make_unique<ParseNode>();
-    det->label = "DET";
-    det->lexeme = "The";
-    det->type = NodeType::TERMINAL;
-
-    auto n = std::make_unique<ParseNode>();
-    n->label = "N";
-    n->lexeme = "dog";
-    n->type = NodeType::TERMINAL;
-
-    np->add_child(std::move(det));
-    np->add_child(std::move(n));
-
-    auto vp = std::make_unique<ParseNode>();
-    vp->label = "VP";
-    vp->type = NodeType::NON_TERMINAL;
-
-    auto v = std::make_unique<ParseNode>();
-    v->label = "V";
-    v->lexeme = "runs";
-    v->type = NodeType::TERMINAL;
-
-    vp->add_child(std::move(v));
-
-    root->add_child(std::move(np));
-    root->add_child(std::move(vp));
-
-    // Redirect stdout to capture output
-    testing::internal::CaptureStdout();
-    Display::print_tree(root.get());
-    std::string output = testing::internal::GetCapturedStdout();
-
-    std::string expected = 
-        "S\n"
-        "├── NP\n"
-        "│   ├── DET: \"The\"\n"
-        "│   └── N: \"dog\"\n"
-        "└── VP\n"
-        "    └── V: \"runs\"\n";
-
-    EXPECT_EQ(output, expected);
-}
-
-```
-
-## File: `tests/test_lexer.cpp`
-
-```cpp
-#include <gtest/gtest.h>
-#include "lexer.h"
-
-TEST(LexerTest, Determiners) {
-    Lexer l("the");
-    auto tokens = l.tokenize();
-    ASSERT_EQ(tokens.size(), 1);
-    EXPECT_EQ(tokens[0].tag, POS::DET);
-}
-
-TEST(LexerTest, PunctuationStripping) {
-    Lexer l("Hello, world!");
-    auto tokens = l.tokenize();
-    ASSERT_EQ(tokens.size(), 2);
-    EXPECT_EQ(tokens[0].word, "Hello");
-    EXPECT_EQ(tokens[1].word, "world");
-}
-
-TEST(LexerTest, SuffixHeuristic_ly) {
-    Lexer l("quickly");
-    auto tokens = l.tokenize();
-    ASSERT_EQ(tokens.size(), 1);
-    EXPECT_EQ(tokens[0].tag, POS::ADV);
-}
-
-TEST(LexerTest, SuffixHeuristic_ing) {
-    Lexer l("running");
-    auto tokens = l.tokenize();
-    ASSERT_EQ(tokens.size(), 1);
-    EXPECT_EQ(tokens[0].tag, POS::V);
-}
-
-TEST(LexerTest, SuffixHeuristic_ed) {
-    Lexer l("walked");
-    auto tokens = l.tokenize();
-    ASSERT_EQ(tokens.size(), 1);
-    EXPECT_EQ(tokens[0].tag, POS::V);
-}
-
-TEST(LexerTest, SuffixHeuristic_tion_ness_ment) {
-    Lexer l("action happiness placement");
-    auto tokens = l.tokenize();
-    ASSERT_EQ(tokens.size(), 3);
-    EXPECT_EQ(tokens[0].tag, POS::N);
-    EXPECT_EQ(tokens[1].tag, POS::N);
-    EXPECT_EQ(tokens[2].tag, POS::N);
-}
-
-TEST(LexerTest, ProperNounHeuristic) {
-    Lexer l("the John runs");
-    auto tokens = l.tokenize();
-    ASSERT_EQ(tokens.size(), 3);
-    EXPECT_EQ(tokens[1].tag, POS::PROPER_N);
-}
-
-TEST(LexerTest, BasicSentence) {
-    Lexer l("The quick brown fox jumps.");
-    auto tokens = l.tokenize();
-    ASSERT_EQ(tokens.size(), 5);
-    EXPECT_EQ(tokens[0].tag, POS::DET);
-    EXPECT_EQ(tokens[1].tag, POS::ADJ);
-    EXPECT_EQ(tokens[2].tag, POS::ADJ);
-    EXPECT_EQ(tokens[3].tag, POS::N);
-    EXPECT_EQ(tokens[4].tag, POS::V);
-}
-
-TEST(LexerTest, UnknownWord) {
-    Lexer l("jabberwocky");
-    auto tokens = l.tokenize();
-    ASSERT_EQ(tokens.size(), 1);
-    EXPECT_EQ(tokens[0].tag, POS::UNKNOWN);
-}
-
-TEST(LexerTest, CaseInsensitiveLookup) {
-    Lexer l("THE DOG RUNS");
-    auto tokens = l.tokenize();
-    ASSERT_EQ(tokens.size(), 3);
-    EXPECT_EQ(tokens[0].tag, POS::DET);
-    EXPECT_EQ(tokens[1].tag, POS::N);
-    EXPECT_EQ(tokens[2].tag, POS::V);
-}
-
-```
-
-## File: `tests/test_symbol_table.cpp`
-
-```cpp
-#include <gtest/gtest.h>
-#include "lexer.h"
-#include "top_down_parser.h"
-#include "symbol_table.h"
-#include <algorithm>
-
-std::unique_ptr<ParseNode> get_tree(const std::string& input) {
-    Lexer lexer(input);
-    auto tokens = lexer.tokenize();
-    TopDownParser parser(tokens);
-    return parser.parse();
-}
-
-TEST(SymbolTableTest, ExtractsVerb) {
-    auto tree = get_tree("The dog runs");
-    SymbolTable st;
-    st.build(tree.get());
-    auto& entries = st.entries();
-    
-    auto verb_it = std::find_if(entries.begin(), entries.end(),
-        [](const auto& e){ return e.pos_tag == "V"; });
-    
-    EXPECT_NE(verb_it, entries.end());
-    EXPECT_EQ(verb_it->lexeme, "runs");
-    EXPECT_EQ(verb_it->grammar_role, "VP.head");
-    EXPECT_EQ(verb_it->scope, "Sentence");
-}
-
-TEST(SymbolTableTest, PrepPhraseScope) {
-    auto tree = get_tree("The dog sleeps in the house");
-    SymbolTable st;
-    st.build(tree.get());
-    auto& entries = st.entries();
-
-    auto prep_it = std::find_if(entries.begin(), entries.end(),
-        [](const auto& e){ return e.pos_tag == "PREP"; });
-    
-    EXPECT_NE(prep_it, entries.end());
-    EXPECT_EQ(prep_it->grammar_role, "PP.head");
-    EXPECT_EQ(prep_it->scope, "Prepositional");
-    
-    auto noun_it = std::find_if(entries.rbegin(), entries.rend(),
-        [](const auto& e){ return e.pos_tag == "N"; });
-    
-    EXPECT_NE(noun_it, entries.rend());
-    EXPECT_EQ(noun_it->lexeme, "house");
-    EXPECT_EQ(noun_it->grammar_role, "NP.head");
-    EXPECT_EQ(noun_it->scope, "Prepositional");
-}
-
-TEST(SymbolTableTest, CheckGrammarRoles) {
-    auto tree = get_tree("The quick brown fox jumps");
-    SymbolTable st;
-    st.build(tree.get());
-    auto& entries = st.entries();
-
-    EXPECT_EQ(entries.size(), 5);
-    EXPECT_EQ(entries[0].grammar_role, "NP.determiner"); // The
-    EXPECT_EQ(entries[1].grammar_role, "NP.modifier");   // quick
-    EXPECT_EQ(entries[2].grammar_role, "NP.modifier");   // brown
-    EXPECT_EQ(entries[3].grammar_role, "NP.head");       // fox
-    EXPECT_EQ(entries[4].grammar_role, "VP.head");       // jumps
-}
-
-```
-
-## File: `tests/test_top_down.cpp`
-
-```cpp
-#include <gtest/gtest.h>
-#include "lexer.h"
-#include "top_down_parser.h"
-
-std::unique_ptr<ParseNode> parse(const std::string& input) {
-    Lexer lexer(input);
-    auto tokens = lexer.tokenize();
-    TopDownParser parser(tokens);
-    return parser.parse();
-}
-
-TEST(TopDownTest, SimpleSentence) {
-    auto tree = parse("The cat runs");
-    ASSERT_NE(tree, nullptr);
-    EXPECT_EQ(tree->label, "S");
-    EXPECT_EQ(tree->children[0]->label, "NP");
-    EXPECT_EQ(tree->children[1]->label, "VP");
-}
-
-TEST(TopDownTest, ComplexSentence) {
-    auto tree = parse("The quick brown fox jumps over the lazy dog");
-    ASSERT_NE(tree, nullptr);
-    EXPECT_EQ(tree->label, "S");
-    EXPECT_EQ(tree->children[0]->label, "NP");
-    EXPECT_EQ(tree->children[1]->label, "VP");
-    EXPECT_EQ(tree->children[1]->children.size(), 2);
-    EXPECT_EQ(tree->children[1]->children[1]->label, "PP");
-}
-
-TEST(TopDownTest, PronounSentence) {
-    auto tree = parse("She loves him");
-    ASSERT_NE(tree, nullptr);
-    EXPECT_EQ(tree->label, "S");
-    EXPECT_EQ(tree->children[0]->label, "NP");
-    EXPECT_EQ(tree->children[0]->children[0]->lexeme, "She");
-}
-
-TEST(TopDownTest, PrepositionalPhrase) {
-    auto tree = parse("The dog sleeps in the house");
-    ASSERT_NE(tree, nullptr);
-    EXPECT_EQ(tree->label, "S");
-    EXPECT_EQ(tree->children.size(), 2);
-    EXPECT_EQ(tree->children[1]->children.size(), 2); // V and PP
-    EXPECT_EQ(tree->children[1]->children[1]->label, "PP");
-}
-
-TEST(TopDownTest, BareNounVerb) {
-    auto tree = parse("fox jumps");
-    ASSERT_NE(tree, nullptr);
-    EXPECT_EQ(tree->label, "S");
-}
-
-TEST(TopDownTest, FailsOnNonsense) {
-    auto tree = parse("jumps the the");
-    EXPECT_EQ(tree, nullptr);
-}
-
-TEST(TopDownTest, IncompleteSentence) {
-    auto tree = parse("The dog");
-    EXPECT_EQ(tree, nullptr); // NP but missing VP
-}
-
-TEST(TopDownTest, AuxiliaryVerb) {
-    auto tree = parse("The dog is running");
-    ASSERT_NE(tree, nullptr);
-    EXPECT_EQ(tree->children[1]->label, "VP");
-    EXPECT_EQ(tree->children[1]->children[0]->label, "AUX");
-}
-
-```
-
 ## File: `README.md`
 
 ```markdown
@@ -8899,9 +8486,9 @@ Math expressions are evaluated using the Top-Down parser. Note that the symbol t
 
 ### English Sentences
 - **Contractions**: The Lexer naturally handles common contractions (e.g., "won't", "shouldn't", "can't") by stripping apostrophes during tokenization and resolving them to their base auxiliary tags via the dictionary.
-- S -> NP VP | S PP | NP VP PP | INTJ S | INTJ NP ADV | INTJ NP | INTJ | NP AUX NP VP | AUX NP VP | VP | CONJ S S | NP VP CONJ NP | NP VP AUX NP
-- NP -> DET ADJ ADJ N | DET N N | N N | DET ADJ N | DET N | PRON | PROPER_N | N
-- VP -> AUX V NP ADV | VP PP | AUX V NP PP | AUX V NP | AUX V PP | AUX V ADV | AUX ADV V | AUX V | AUX NP PP | AUX NP ADV | AUX NP | AUX ADJ | AUX VP | V NP PP | V NP ADV | V NP | V PP | V ADV | V | AUX ADV
+- S -> NP VP | S PP | S ADV | NP VP PP | INTJ S | INTJ NP ADV | INTJ NP | INTJ | NP AUX NP VP | AUX NP VP | VP | CONJ S S | NP VP CONJ NP | NP VP AUX NP
+- NP -> N N N | DET N N N | DET ADJ ADJ N | DET N N | N N | DET ADJ N | DET NUM N | DET N | NUM ADJ N | NUM N | ADJ ADJ N | ADJ N | ADJ V | DET V N N | DET V N | V N | V | PRON | PROPER_N | N
+- VP -> AUX V NP ADV | VP PP | AUX V NP PP | AUX V NP | AUX V PP | AUX V ADV | AUX ADV V | AUX V | AUX NP PP | AUX NP ADV | AUX NP | AUX PP | AUX ADJ | AUX VP | V NP PP | V NP ADV | V NP | V PP | V ADV | V | AUX ADV
 - PP -> PREP NP
 
 ### Arithmetic Expressions
@@ -8929,174 +8516,5 @@ default:
 build:
     echo 'Building the project...'
     g++ -std=c++17 src/*.cpp -Iinclude -o english-parser
-
-```
-
-## File: `patch_debug`
-
-```text
---- src/bottom_up_parser.cpp
-+++ src/bottom_up_parser.cpp
-@@ -19,6 +19,10 @@
-     while (loop_counter++ < max_loops) {
-+        std::cout << "Stack: ";
-+        for (const auto& item : stack_) std::cout << item.symbol << " ";
-+        std::cout << " | Next: " << (at_end() ? "EOF" : pos_to_str(tokens_[input_pos_].tag)) << "\n";
-         if (stack_.size() == 1 && stack_.back().symbol == "S" && at_end()) {
-             return std::move(stack_.back().node);
-         }
-
-```
-
-## File: `update_bottom_up.patch`
-
-```diff
---- src/bottom_up_parser.cpp
-+++ src/bottom_up_parser.cpp
-@@ -279,6 +279,25 @@
-         stack_.push_back({std::move(node), "S"});
-         return true;
-     }
-+    if (stack_top_matches({"INTJ", "NP"})) {
-+        auto node = std::make_unique<ParseNode>();
-+        node->label = "S";
-+        node->type = NodeType::NON_TERMINAL;
-+        auto np = std::move(stack_.back().node); stack_.pop_back();
-+        auto intj = std::move(stack_.back().node); stack_.pop_back();
-+        node->add_child(std::move(intj));
-+        node->add_child(std::move(np));
-+        stack_.push_back({std::move(node), "S"});
-+        return true;
-+    }
-+    if (stack_top_matches({"INTJ"})) {
-+        auto node = std::make_unique<ParseNode>();
-+        node->label = "S";
-+        node->type = NodeType::NON_TERMINAL;
-+        auto intj = std::move(stack_.back().node); stack_.pop_back();
-+        node->add_child(std::move(intj));
-+        stack_.push_back({std::move(node), "S"});
-+        return true;
-+    }
-     return false;
- }
-
-```
-
-## File: `update_top_down.patch`
-
-```diff
---- src/top_down_parser.cpp
-+++ src/top_down_parser.cpp
-@@ -67,6 +67,23 @@
- std::unique_ptr<ParseNode> TopDownParser::parse_S() {
-     size_t saved_cursor = cursor_;
-     
-+    // S -> NP AUX NP VP
-+    auto s_np_aux = std::make_unique<ParseNode>();
-+    s_np_aux->label = "S";
-+    s_np_aux->type = NodeType::NON_TERMINAL;
-+    if (auto np1 = parse_NP()) {
-+        s_np_aux->add_child(std::move(np1));
-+        if (consume(POS::AUX, s_np_aux.get())) {
-+            if (auto np2 = parse_NP()) {
-+                s_np_aux->add_child(std::move(np2));
-+                if (auto vp = parse_VP()) {
-+                    s_np_aux->add_child(std::move(vp));
-+                    return s_np_aux;
-+                }
-+            }
-+        }
-+    }
-+    cursor_ = saved_cursor;
-+
-     // S -> NP VP PP
-     auto s1 = std::make_unique<ParseNode>();
-     s1->label = "S";
-@@ -95,6 +112,39 @@
-     }
-     cursor_ = saved_cursor;
- 
-+    // S -> AUX NP VP
-+    auto s_aux = std::make_unique<ParseNode>();
-+    s_aux->label = "S";
-+    s_aux->type = NodeType::NON_TERMINAL;
-+    if (consume(POS::AUX, s_aux.get())) {
-+        if (auto np = parse_NP()) {
-+            s_aux->add_child(std::move(np));
-+            if (auto vp = parse_VP()) {
-+                s_aux->add_child(std::move(vp));
-+                return s_aux;
-+            }
-+        }
-+    }
-+    cursor_ = saved_cursor;
-+
-+    // S -> VP
-+    auto s_vp = std::make_unique<ParseNode>();
-+    s_vp->label = "S";
-+    s_vp->type = NodeType::NON_TERMINAL;
-+    if (auto vp = parse_VP()) {
-+        s_vp->add_child(std::move(vp));
-+        return s_vp;
-+    }
-+    cursor_ = saved_cursor;
-+
-+    // S -> INTJ S
-+    auto s_intj_s = std::make_unique<ParseNode>();
-+    s_intj_s->label = "S";
-+    s_intj_s->type = NodeType::NON_TERMINAL;
-+    if (consume(POS::INTJ, s_intj_s.get())) {
-+        if (auto s = parse_S()) {
-+            s_intj_s->add_child(std::move(s));
-+            return s_intj_s;
-+        }
-+    }
-+    cursor_ = saved_cursor;
-+
-+    // S -> INTJ NP ADV
-+    auto s_intj_np_adv = std::make_unique<ParseNode>();
-+    s_intj_np_adv->label = "S";
-+    s_intj_np_adv->type = NodeType::NON_TERMINAL;
-+    if (consume(POS::INTJ, s_intj_np_adv.get())) {
-+        if (auto np = parse_NP()) {
-+            s_intj_np_adv->add_child(std::move(np));
-+            if (consume(POS::ADV, s_intj_np_adv.get())) {
-+                return s_intj_np_adv;
-+            }
-+        }
-+    }
-+    cursor_ = saved_cursor;
-+
-     // S -> INTJ NP
-     auto s3 = std::make_unique<ParseNode>();
-     s3->label = "S";
-@@ -210,6 +260,25 @@
-     }
-     cursor_ = saved_cursor;
- 
-+    // VP -> AUX NP
-+    auto vp_aux_np = std::make_unique<ParseNode>();
-+    vp_aux_np->label = "VP";
-+    vp_aux_np->type = NodeType::NON_TERMINAL;
-+    if (consume(POS::AUX, vp_aux_np.get())) {
-+        if (auto np = parse_NP()) {
-+            vp_aux_np->add_child(std::move(np));
-+            return vp_aux_np;
-+        }
-+    }
-+    cursor_ = saved_cursor;
-+
-+    // VP -> AUX ADJ
-+    auto vp_aux_adj = std::make_unique<ParseNode>();
-+    vp_aux_adj->label = "VP";
-+    vp_aux_adj->type = NodeType::NON_TERMINAL;
-+    if (consume(POS::AUX, vp_aux_adj.get()) && consume(POS::ADJ, vp_aux_adj.get())) {
-+        return vp_aux_adj;
-+    }
-+    cursor_ = saved_cursor;
-+
-     // VP -> V NP PP
-     auto vp1 = std::make_unique<ParseNode>();
-     vp1->label = "VP";
 
 ```

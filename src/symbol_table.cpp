@@ -30,7 +30,9 @@ void SymbolTable::traverse(const ParseNode* node, const std::string& parent_labe
         } else if (parent_label == "VP") {
             if (node->label == "V") role = "VP.head";
             else if (node->label == "AUX") role = "VP.auxiliary";
+            else if (node->label == "ADV") role = "VP.modifier";
             else if (node->label == "ADV" || node->label == "ADJ") role = "VP.modifier";
+            else if (node->label == "PREP") role = "VP.infinitive_marker";
             else role = parent_label + "." + node->label;
         } else if (parent_label == "PP") {
             if (node->label == "PREP") role = "PP.head";
@@ -41,6 +43,10 @@ void SymbolTable::traverse(const ParseNode* node, const std::string& parent_labe
             role = "S.auxiliary";
         } else if (parent_label == "S" && node->label == "CONJ") {
             role = "S.conjunction";
+        } else if (parent_label == "S" && node->label == "ADV") {
+            role = "S.modifier";
+        } else if (parent_label == "VP" && node->label == "PREP") {
+            role = "VP.infinitive_marker";
         } else {
             role = parent_label + "." + node->label;
         }
