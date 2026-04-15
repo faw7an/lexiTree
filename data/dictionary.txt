@@ -4090,3 +4090,15 @@ solved V
 solveing V
 dog V
 dogs V
+arrogant ADJ
+donald PROPER_N
+trump PROPER_N
+iran PROPER_N
+foolish ADJ
+robot N
+juice N
+bin N
+hostel N
+charger N
+hole N
+break N

@@ -478,12 +478,28 @@ std::unique_ptr<ParseNode> TopDownParser::parse_NP() {
     if (consume(POS::NUM, n.get()) && consume(POS::ADJ, n.get()) && consume(POS::N, n.get())) goto check_extra;
     cursor_ = saved_cursor; n = std::make_unique<ParseNode>(); n->label = "NP"; n->type = NodeType::NON_TERMINAL;
 
+    // NUM N
+    if (consume(POS::NUM, n.get()) && consume(POS::N, n.get())) goto check_extra;
+    cursor_ = saved_cursor; n = std::make_unique<ParseNode>(); n->label = "NP"; n->type = NodeType::NON_TERMINAL;
+
     // DET N
     if (consume(POS::DET, n.get()) && consume(POS::N, n.get())) goto check_extra;
     cursor_ = saved_cursor; n = std::make_unique<ParseNode>(); n->label = "NP"; n->type = NodeType::NON_TERMINAL;
 
     // ADJ N
     if (consume(POS::ADJ, n.get()) && consume(POS::N, n.get())) goto check_extra;
+    cursor_ = saved_cursor; n = std::make_unique<ParseNode>(); n->label = "NP"; n->type = NodeType::NON_TERMINAL;
+
+    // ADJ PROPER_N PROPER_N
+    if (consume(POS::ADJ, n.get()) && consume(POS::PROPER_N, n.get()) && consume(POS::PROPER_N, n.get())) goto check_extra;
+    cursor_ = saved_cursor; n = std::make_unique<ParseNode>(); n->label = "NP"; n->type = NodeType::NON_TERMINAL;
+
+    // ADJ PROPER_N
+    if (consume(POS::ADJ, n.get()) && consume(POS::PROPER_N, n.get())) goto check_extra;
+    cursor_ = saved_cursor; n = std::make_unique<ParseNode>(); n->label = "NP"; n->type = NodeType::NON_TERMINAL;
+
+    // PROPER_N PROPER_N
+    if (consume(POS::PROPER_N, n.get()) && consume(POS::PROPER_N, n.get())) goto check_extra;
     cursor_ = saved_cursor; n = std::make_unique<ParseNode>(); n->label = "NP"; n->type = NodeType::NON_TERMINAL;
 
     // DET PROPER_N
@@ -501,6 +517,14 @@ std::unique_ptr<ParseNode> TopDownParser::parse_NP() {
 
     // PROPER_N
     if (consume(POS::PROPER_N, n.get())) goto check_extra;
+    cursor_ = saved_cursor; n = std::make_unique<ParseNode>(); n->label = "NP"; n->type = NodeType::NON_TERMINAL;
+
+    // N N N
+    if (consume(POS::N, n.get()) && consume(POS::N, n.get()) && consume(POS::N, n.get())) goto check_extra;
+    cursor_ = saved_cursor; n = std::make_unique<ParseNode>(); n->label = "NP"; n->type = NodeType::NON_TERMINAL;
+
+    // N N
+    if (consume(POS::N, n.get()) && consume(POS::N, n.get())) goto check_extra;
     cursor_ = saved_cursor; n = std::make_unique<ParseNode>(); n->label = "NP"; n->type = NodeType::NON_TERMINAL;
 
     // N
@@ -605,10 +629,16 @@ std::unique_ptr<ParseNode> TopDownParser::parse_VP() {
             cursor_ = checkpoint;
             // V + PREP + VP (to give)
             if (consume(POS::PREP, v.get())) {
-                size_t checkpoint2 = cursor_;
                 if (auto child = parse_VP()) { v->add_child(std::move(child)); vp_node = std::move(v); goto finalize; }
-                else cursor_ = checkpoint;
+                else {
+                    cursor_ = checkpoint;
+                    v->children.pop_back(); // Remove PREP
+                }
             }
+            cursor_ = checkpoint;
+            // V + PP
+            if (auto pp = parse_PP()) { v->add_child(std::move(pp)); vp_node = std::move(v); goto finalize; }
+            
             cursor_ = checkpoint;
             vp_node = std::move(v); goto finalize; // VP -> V
         }

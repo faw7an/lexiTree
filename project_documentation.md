@@ -7,7 +7,31 @@ By unifying both Top-Down (Recursive Descent) and Bottom-Up (Shift-Reduce) parsi
 
 ---
 
-## 2. Core Functionalities & Features
+
+## 2. Build & Execution Instructions
+
+### Compilation Requirements
+This compiler is written strictly in C++17 and relies on standard libraries. No external C++ dependencies (e.g., Boost) are required.
+
+To compile the project from the source code, use a C++17 compatible compiler (e.g., `g++` or `clang++`):
+```bash
+g++ -std=c++17 src/*.cpp -Iinclude -o english-parser
+```
+
+### Execution
+The compiled executable requires a string input and supports optional flags for altering the parsing strategy or exporting the Abstract Syntax Tree.
+```bash
+# Default Top-Down Parsing
+./english-parser "The quick brown fox jumps"
+
+# Force Bottom-Up (Shift-Reduce) Parsing
+./english-parser --bottom-up "A girl reads a book"
+
+# Export the AST to Graphviz DOT format for graphical rendering
+./english-parser --dot tree.dot "The dog barks"
+```
+
+## 3. Core Functionalities & Features
 
 ### Lexical Analysis (Tokenizer)
 The compiler features a custom-built Lexer that sanitizes and breaks down input strings into a sequence of discrete `Token` objects. It assigns grammatical Parts of Speech (POS) by cross-referencing a large, built-in dictionary file. When an unknown word is encountered, the Lexer utilizes fallback suffix heuristics (e.g., recognizing "-ing" as verbs, "-ly" as adverbs, and "-ed" as past-tense verbs).
@@ -30,7 +54,18 @@ Beyond natural language, the compiler integrates mathematical parsing. It evalua
 
 ---
 
-## 3. Complete Source Code
+## 4. System Pipeline & Data Flow
+
+Before analyzing the raw C++ implementation, it is essential to understand the compiler's linear data flow:
+1. **Input:** The system receives a raw English sentence or mathematical expression as a string.
+2. **Lexical Analysis:** The `Lexer` iterates through the string, removing punctuation, handling contractions, and consulting the `pos_dict` (Parts of Speech Dictionary) to produce a `std::vector<Token>`.
+3. **Parsing:** The selected engine (`TopDownParser` or `BottomUpParser`) consumes the tokens sequentially. Applying Context-Free Grammar rules, it constructs an N-ary Abstract Syntax Tree composed of `ParseNode` objects.
+4. **Symbol Table Generation:** The `SymbolTable` class traverses the AST post-generation to deduce the grammatical role of every terminal node.
+5. **Visualization:** The `Display` class recursively traverses the AST to print a formatted 2D ASCII structure directly to the terminal.
+
+---
+
+## 5. Complete Source Code
 
 The following section contains the full, unabridged source code for the entire compiler. This encompasses the Lexer, Top-Down Parser, Bottom-Up Parser, Symbol Table generator, and ASCII display logic.
 
@@ -3235,7 +3270,31 @@ std::unique_ptr<ParseNode> TopDownParser::parse_FACTOR() {
 
 ---
 
-## 4. Supported Context-Free Grammar (CFG)
+
+### `data/dictionary.txt` (Data Dependency)
+
+**Description:** The lexical analyzer relies on an external, plain-text dictionary file loaded at runtime to map English words to their primary Parts of Speech (POS). If a word is not found here, the Lexer falls back to heuristic suffix analysis. Below is a truncated sample illustrating the required format:
+
+```text
+the DET
+a DET
+quick ADJ
+brown ADJ
+fox N
+boy N
+girl N
+runs V
+jumps V
+reads V
+is AUX
+and CONJ
+although CONJ
+```
+
+
+---
+
+## 6. Supported Context-Free Grammar (CFG)
 
 The compiler translates the following formal grammar rules.
 
@@ -3252,7 +3311,7 @@ The compiler translates the following formal grammar rules.
 
 ---
 
-## 5. Usage Examples & Expected Output
+## 7. Usage Examples & Expected Output
 
 Below are literal terminal outputs demonstrating the parser's robustness in handling different syntactical structures using both Top-Down and Bottom-Up strategies.
 
@@ -3284,19 +3343,10 @@ Symbol Table:
 └-------┴--------┴---------┴---------------┴----------┘
 ```
 
-### Example 2: Shift-Reduce Parsing with State Logging (Bottom-Up Parsing)
+### Example 2: Shift-Reduce Parsing (Bottom-Up Parsing)
 `./english-parser --bottom-up "A girl reads a book"`
 
 ```text
-Shifted: DET (A)
-Shifted: N (girl)
-Reduced: NP (Stack size: 1) Node labels: DET N 
-Shifted: V (reads)
-Shifted: DET (a)
-Shifted: N (book)
-Reduced: NP (Stack size: 3) Node labels: DET N 
-Reduced: VP (Stack size: 2) Node labels: V NP 
-Reduced: S (Stack size: 1) Node labels: NP VP 
 ========================================
  Parsing Strategy: Bottom-Up (Shift-Reduce)
 ========================================
@@ -3385,5 +3435,67 @@ FACTOR       FACTOR        FACTOR   OP                  FACTOR
                                                    "3"           "4"          
 ```
 
-## 6. Conclusion
+### Example 5: Graphviz DOT Export
+`./english-parser --dot example_tree.dot "The boy runs"`
+
+```dot
+digraph ParseTree {
+    node [shape=box, style=rounded, fontname="Helvetica,Arial,sans-serif"];
+    edge [dir=none];
+    node0 [label="S"];
+    node0 -> node1;
+    node1 [label="NP"];
+    node1 -> node2;
+    node2 [label="DET\n\"The\"", shape=ellipse];
+    node1 -> node3;
+    node3 [label="N\n\"boy\"", shape=ellipse];
+    node0 -> node4;
+    node4 [label="VP"];
+    node4 -> node5;
+    node5 [label="V\n\"runs\"", shape=ellipse];
+}
+```
+
+
+### Example 6: Complex Sentence Structures
+The parsers successfully resolve ambiguous components and nested prepositional phrases into robust AST derivations.
+`./english-parser "The foolish robot moved the red juice to the big bin."`
+```text
+========================================
+ Parsing Strategy: Top-Down (Recursive Descent)
+========================================
+
+                                 S                                                  
+            ┌────────────────────┴─────────────────────┐                            
+          NP                                VP                                      
+  ┌────────┼─────────┐        ┌──────────────┴──────────────┐                       
+ DET      ADJ        N        V                          NP                         
+"The"  "foolish"  "robot"  "moved"            ┌───────────┴────────────┐            
+                                            NP                    PP                
+                                      ┌──────┼───────┐       ┌─────┴──────┐         
+                                     DET    ADJ      N     PREP          NP         
+                                    "the"  "red"  "juice"  "to"    ┌──────┼──────┐  
+                                                                  DET    ADJ     N  
+                                                                 "the"  "big"  "bin"
+```
+
+`./english-parser "Arrogant Donald Trump started war with Iran."`
+```text
+========================================
+ Parsing Strategy: Top-Down (Recursive Descent)
+========================================
+
+                              S                                             
+             ┌────────────────┴───────────────┐                             
+           NP                                VP                             
+  ┌────────┼────────┐         ┌───────────────┴───────────────┐             
+ ADJ    PROPER_N PROPER_N     V                              NP             
+"Arrogant"  "Donald"  "Trump"  "started"               ┌────────┴───────┐           
+                                                  NP               PP           
+                                                   │            ┌───┴────┐      
+                                                   N          PREP    PROPER_N  
+                                                 "war"        "with"   "Iran"   
+```
+
+## 8. Conclusion
 The implementation of the `english-parser` project proves successful in parsing context-free grammars for both natural language constructs and strict mathematical expressions. By employing rigorous tokenization alongside two standard, high-performance compiler architectures (Top-Down and Bottom-Up), the project provides deep analytical insights into the hierarchical and syntactical structure of English, effectively mirroring real-world compiler capabilities.
